@@ -1,892 +1,1114 @@
 <!doctype html>
 <html lang="ko">
-    <head>
-        <meta charset="utf-8">
-        <meta name="referrer" content="strict-origin-when-cross-origin">
-        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-        <title>Cozy Pomodoro</title>
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
 
-        <style>
-            :root {
-                --white: rgba(255,255,255,.94);
-            }
+<title>Cozy Pomodoro</title>
 
-            * {
-                box-sizing: border-box;
-            }
+<style>
+:root {
+  --white: rgba(255,255,255,.94);
+}
 
-            html,
-            body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                overflow: hidden;
-                font-family: Arial, "Noto Sans KR", sans-serif;
-            }
+* {
+  box-sizing: border-box;
+}
 
-            body {
-                background: #222;
-                color: white;
-            }
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: Arial, "Noto Sans KR", sans-serif;
+}
 
-            #bg {
-                position: fixed;
-                inset: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: -3;
-                transition: opacity .6s;
-            }
-
-            #shade {
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.16);
-                z-index: -2;
-            }
-
-            .wrap {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 24px;
-            }
-
-            .timerBox {
-                width: 100%;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .ring {
-                width: min(52vh, 430px);
-                height: min(52vh, 430px);
-                position: relative;
-                display: grid;
-                place-items: center;
-            }
-
-            svg {
-                position: absolute;
-                inset: 0;
-                width: 100%;
-                height: 100%;
-                transform: rotate(-90deg);
-            }
-
-            .track {
-                fill: none;
-                stroke: rgba(255,255,255,.32);
-                stroke-width: 5;
-            }
-
-            .progress {
-                fill: none;
-                stroke: white;
-                stroke-width: 5;
-                stroke-linecap: round;
-                transition: stroke-dashoffset .25s linear;
-            }
-
-            .time {
-                font-size: clamp(58px, 9vw, 104px);
-                font-weight: 700;
-                letter-spacing: 2px;
-                text-shadow: 0 2px 12px rgba(0,0,0,.28);
-                white-space: nowrap;
-            }
-
-            .mode {
-                margin-top: 10px;
-                font-size: 15px;
-                letter-spacing: 4px;
-                font-weight: 700;
-                text-shadow: 0 2px 8px rgba(0,0,0,.35);
-            }
-
-            .controls {
-                margin-top: 24px;
-                display: flex;
-                gap: 9px;
-                flex-wrap: wrap;
-                justify-content: center;
-                max-width: 100%;
-            }
-
-            button {
-                border: 1px solid rgba(255,255,255,.55);
-                background: rgba(255,255,255,.18);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-                color: white;
-                border-radius: 999px;
-                padding: 10px 17px;
-                font-size: 14px;
-                cursor: pointer;
-                white-space: nowrap;
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            button:hover {
-                background: rgba(255,255,255,.30);
-            }
-
-            button:active {
-                background: rgba(255,255,255,.36);
-                transform: scale(.97);
-            }
-
-            .badge {
-                position: fixed;
-                top: 18px;
-                left: 18px;
-                padding: 7px 11px;
-                border-radius: 999px;
-                background: rgba(0,0,0,.25);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-                font-size: 12px;
-            }
-
-            #toast {
-                position: fixed;
-                top: 18px;
-                left: 50%;
-                transform: translateX(-50%) translateY(-20px);
-                opacity: 0;
-                transition: .35s;
-                padding: 10px 16px;
-                border-radius: 999px;
-                background: rgba(0,0,0,.55);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                font-size: 13px;
-                pointer-events: none;
-                white-space: nowrap;
-                z-index: 10;
-            }
-
-            #toast.show {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
+body {
+  background: #222;
+  color: white;
+}
 
 
-            /* ========================================
-               모바일 세로 화면
-               ======================================== */
+/* =========================
+   BACKGROUND
+========================= */
 
-            @media (max-width: 600px) {
+#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -3;
+  transition: opacity .6s;
+}
 
-                .wrap {
-                    padding:
-                        max(20px, env(safe-area-inset-top))
-                        max(20px, env(safe-area-inset-right))
-                        max(20px, env(safe-area-inset-bottom))
-                        max(20px, env(safe-area-inset-left));
-                }
-
-                .timerBox {
-                    max-width: 100%;
-                }
-
-                .ring {
-                    width: min(78vw, 330px);
-                    height: min(78vw, 330px);
-                }
-
-                .time {
-                    font-size: clamp(50px, 15vw, 78px);
-                    letter-spacing: 1px;
-                }
-
-                .mode {
-                    margin-top: 7px;
-                    font-size: 13px;
-                    letter-spacing: 3px;
-                }
-
-                .controls {
-                    width: 100%;
-                    margin-top: 20px;
-                    gap: 8px;
-                    padding: 0 4px;
-                }
-
-                button {
-                    padding: 9px 14px;
-                    font-size: 13px;
-                }
-
-                .badge {
-                    top: max(12px, env(safe-area-inset-top));
-                    left: max(12px, env(safe-area-inset-left));
-                    padding: 6px 9px;
-                    font-size: 11px;
-                }
-
-                #toast {
-                    top: max(12px, env(safe-area-inset-top));
-                    max-width: calc(100vw - 40px);
-                    padding: 9px 14px;
-                    font-size: 12px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
+#shade {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.16);
+  z-index: -2;
+}
 
 
-            /* ========================================
-               아주 작은 모바일 화면
-               ======================================== */
+/* =========================
+   MAIN
+========================= */
 
-            @media (max-width: 380px) {
+.wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
 
-                .wrap {
-                    padding: 16px;
-                }
+.timerBox {
+  width: 100%;
+  text-align: center;
 
-                .ring {
-                    width: min(72vw, 280px);
-                    height: min(72vw, 280px);
-                }
-
-                .time {
-                    font-size: clamp(44px, 14vw, 64px);
-                }
-
-                .mode {
-                    font-size: 12px;
-                    letter-spacing: 2.5px;
-                }
-
-                .controls {
-                    gap: 6px;
-                    margin-top: 16px;
-                }
-
-                button {
-                    padding: 8px 11px;
-                    font-size: 12px;
-                }
-            }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 
-            /* ========================================
-               모바일 가로 화면
-               ======================================== */
+/* =========================
+   TIMER RING
+========================= */
 
-            @media (max-width: 900px) and (orientation: landscape) {
+.ring {
+  width: min(52vh, 430px);
+  height: min(52vh, 430px);
 
-                .wrap {
-                    padding: 12px 20px;
-                }
+  position: relative;
 
-                .timerBox {
-                    transform: scale(.82);
-                }
+  display: grid;
+  place-items: center;
+}
 
-                .ring {
-                    width: min(65vh, 300px);
-                    height: min(65vh, 300px);
-                }
+svg {
+  position: absolute;
+  inset: 0;
 
-                .controls {
-                    margin-top: 14px;
-                }
+  width: 100%;
+  height: 100%;
 
-                .badge {
-                    top: 10px;
-                    left: 10px;
-                }
+  transform: rotate(-90deg);
+}
 
-                #toast {
-                    top: 10px;
-                }
-            }
-        </style>
-    </head>
+.track {
+  fill: none;
+  stroke: rgba(255,255,255,.32);
+  stroke-width: 5;
+}
 
-    <body>
+.progress {
+  fill: none;
+  stroke: white;
+  stroke-width: 5;
+  stroke-linecap: round;
 
-        <img id="bg" alt="">
-        <div id="shade"></div>
+  transition: stroke-dasharray .25s linear;
+}
 
-        <div class="badge" id="session">
-            ROUND 1
+
+/* =========================
+   TIME
+========================= */
+
+.time {
+  font-size: clamp(58px, 9vw, 104px);
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  text-shadow: 0 2px 12px rgba(0,0,0,.28);
+
+  white-space: nowrap;
+}
+
+.mode {
+  margin-top: 10px;
+
+  font-size: 15px;
+  letter-spacing: 4px;
+  font-weight: 700;
+
+  text-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.controls {
+  width: 100%;
+
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  justify-content: center;
+  align-items: center;
+
+  max-width: 100%;
+}
+
+button {
+  border: 1px solid rgba(255,255,255,.55);
+
+  background: rgba(255,255,255,.18);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  color: white;
+
+  border-radius: 999px;
+
+  padding: 10px 17px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background .15s,
+    transform .1s;
+}
+
+button:hover {
+  background: rgba(255,255,255,.30);
+}
+
+button:active {
+  background: rgba(255,255,255,.36);
+  transform: scale(.97);
+}
+
+
+/* =========================
+   ROUND BADGE
+========================= */
+
+.badge {
+  position: fixed;
+
+  top: 18px;
+  left: 18px;
+
+  padding: 7px 11px;
+
+  border-radius: 999px;
+
+  background: rgba(0,0,0,.25);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+#toast {
+  position: fixed;
+
+  top: 18px;
+  left: 50%;
+
+  transform:
+    translateX(-50%)
+    translateY(-20px);
+
+  opacity: 0;
+
+  transition: .35s;
+
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  background: rgba(0,0,0,.55);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  font-size: 13px;
+
+  pointer-events: none;
+
+  white-space: nowrap;
+
+  z-index: 10;
+}
+
+#toast.show {
+  opacity: 1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .wrap {
+    padding:
+      max(16px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+
+  .timerBox {
+    width: 100%;
+  }
+
+
+  /* 원형 타이머 크기 */
+
+  .ring {
+    width: min(66vw, 290px);
+    height: min(66vw, 290px);
+  }
+
+
+  /* 시간 */
+
+  .time {
+    font-size: clamp(48px, 14vw, 72px);
+    letter-spacing: 1px;
+  }
+
+  .mode {
+    margin-top: 5px;
+
+    font-size: 12px;
+    letter-spacing: 3px;
+  }
+
+
+  /* 버튼
+     기본은 가로 배치.
+     화면이 부족하면 자동 줄바꿈.
+  */
+
+  .controls {
+    width: 100%;
+
+    margin-top: 10px;
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 6px;
+  }
+
+  button {
+    width: auto;
+
+    min-height: 34px;
+
+    padding: 7px 14px;
+
+    font-size: 12px;
+
+    line-height: 1.2;
+  }
+
+
+  /* ROUND 표시 */
+
+  .badge {
+    top: max(10px, env(safe-area-inset-top));
+    left: max(10px, env(safe-area-inset-left));
+
+    padding: 6px 9px;
+
+    font-size: 11px;
+  }
+
+
+  /* Toast */
+
+  #toast {
+    top: max(10px, env(safe-area-inset-top));
+
+    max-width: calc(100vw - 32px);
+
+    padding: 8px 13px;
+
+    font-size: 12px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .wrap {
+    padding: 12px;
+  }
+
+
+  /* 원형을 조금 더 작게 */
+
+  .ring {
+    width: min(60vw, 250px);
+    height: min(60vw, 250px);
+  }
+
+  .time {
+    font-size: clamp(42px, 13vw, 60px);
+  }
+
+  .mode {
+    margin-top: 4px;
+
+    font-size: 11px;
+    letter-spacing: 2.5px;
+  }
+
+
+  /* 버튼은 여전히 가로 우선,
+     공간이 없으면 자동으로 다음 줄 */
+
+  .controls {
+    margin-top: 7px;
+    gap: 5px;
+  }
+
+  button {
+    width: auto;
+
+    min-height: 32px;
+
+    padding: 6px 12px;
+
+    font-size: 11px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE LANDSCAPE
+========================================================= */
+
+@media (max-width: 900px) and (orientation: landscape) {
+
+  .wrap {
+    padding: 10px 16px;
+  }
+
+  .timerBox {
+    transform: scale(.72);
+  }
+
+
+  /* 가로 화면에서는 높이 기준으로 원 크기 결정 */
+
+  .ring {
+    width: min(58vh, 280px);
+    height: min(58vh, 280px);
+  }
+
+
+  /* 버튼도 가로 우선 */
+
+  .controls {
+    margin-top: 8px;
+
+    display: flex;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 5px;
+  }
+
+  button {
+    width: auto;
+
+    min-height: 30px;
+
+    padding: 6px 12px;
+
+    font-size: 11px;
+  }
+
+  .badge {
+    top: 8px;
+    left: 8px;
+  }
+
+  #toast {
+    top: 8px;
+  }
+}
+</style>
+</head>
+
+
+<body>
+
+<!-- =========================
+     BACKGROUND
+========================= -->
+
+<img id="bg" alt="">
+
+<div id="shade"></div>
+
+
+<!-- =========================
+     ROUND
+========================= -->
+
+<div class="badge" id="session">
+  ROUND 1
+</div>
+
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div id="toast"></div>
+
+
+<!-- =========================
+     TIMER
+========================= -->
+
+<div class="wrap">
+
+  <div class="timerBox">
+
+    <div class="ring">
+
+      <svg
+        viewBox="0 0 200 200"
+        aria-hidden="true"
+      >
+
+        <!-- 전체 원 -->
+        <circle
+          class="track"
+          cx="100"
+          cy="100"
+          r="92"
+        ></circle>
+
+        <!-- 진행 원 -->
+        <circle
+          class="progress"
+          id="progress"
+          cx="100"
+          cy="100"
+          r="92"
+        ></circle>
+
+      </svg>
+
+
+      <div>
+
+        <div
+          class="time"
+          id="time"
+        >
+          25:00
         </div>
 
-        <div id="toast"></div>
-
-        <div class="wrap">
-            <div class="timerBox">
-
-                <div class="ring">
-
-                    <svg viewBox="0 0 200 200" aria-hidden="true">
-
-                        <circle
-                            class="track"
-                            cx="100"
-                            cy="100"
-                            r="92">
-                        </circle>
-
-                        <circle
-                            class="progress"
-                            id="progress"
-                            cx="100"
-                            cy="100"
-                            r="92">
-                        </circle>
-
-                    </svg>
-
-                    <div>
-
-                        <div
-                            class="time"
-                            id="time">
-                            25:00
-                        </div>
-
-                        <div
-                            class="mode"
-                            id="mode">
-                            FOCUS
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="controls">
-
-                    <button id="start">
-                        ▶ 시작
-                    </button>
-
-                    <button id="pause">
-                        Ⅱ 일시정지
-                    </button>
-
-                    <button id="skip">
-                        다음 단계 →
-                    </button>
-
-                    <button id="reset">
-                        ↻ 처음부터
-                    </button>
-
-                </div>
-
-            </div>
+        <div
+          class="mode"
+          id="mode"
+        >
+          집중
         </div>
 
+      </div>
 
-        <script>
+    </div>
 
-            /* ========================================
-               기본 배경
-               ======================================== */
 
-            const BUILTIN = [
-                "backgrounds/bg1.jpg",
-                "backgrounds/bg2.jpg",
-                "backgrounds/bg3.jpg"
-            ];
+    <!-- =========================
+         CONTROLS
+    ========================= -->
 
-            let backgrounds = [...BUILTIN];
-            let currentBg = -1;
+    <div class="controls">
 
+      <button id="start">
+        ▶ 시작
+      </button>
 
-            /* ========================================
-               DOM
-               ======================================== */
+      <button id="pause">
+        Ⅱ 일시정지
+      </button>
 
-            const bg = document.getElementById("bg");
-            const timeEl = document.getElementById("time");
-            const modeEl = document.getElementById("mode");
-            const progress = document.getElementById("progress");
-            const sessionEl = document.getElementById("session");
-            const toast = document.getElementById("toast");
+      <button id="skip">
+        다음 단계 →
+      </button>
 
+      <button id="reset">
+        ↻ 처음부터
+      </button>
 
-            /* ========================================
-               진행 링
-               ======================================== */
+    </div>
 
-            const R = 92;
-            const C = 2 * Math.PI * R;
+  </div>
 
-            progress.style.strokeDasharray = `0 ${C}`;
-            progress.style.strokeDashoffset = 0;
+</div>
 
 
-            /* ========================================
-               타이머 상태
-               ======================================== */
+<script>
 
-            let phase = "focus";
-            let duration = 25 * 60;
-            let remaining = duration;
+/* =========================================================
+   BACKGROUNDS
+========================================================= */
 
-            let running = false;
-            let lastTick = null;
-            let round = 1;
-            let timerId = null;
+const BUILTIN = [
+  "backgrounds/bg1.jpg",
+  "backgrounds/bg2.jpg",
+  "backgrounds/bg3.jpg"
+];
 
-            let audioCtx = null;
+let backgrounds = [...BUILTIN];
+let currentBg = -1;
 
+const bg = document.getElementById("bg");
 
-            /* ========================================
-               배경 변경
-               ======================================== */
+const timeEl = document.getElementById("time");
+const modeEl = document.getElementById("mode");
+const progress = document.getElementById("progress");
+const sessionEl = document.getElementById("session");
+const toast = document.getElementById("toast");
 
-            function pickBackground() {
 
-                if (backgrounds.length === 0) {
-                    return;
-                }
+/* =========================================================
+   CIRCLE
+========================================================= */
 
-                let next;
+const R = 92;
 
-                do {
-                    next = Math.floor(
-                        Math.random() * backgrounds.length
-                    );
-                } while (
-                    backgrounds.length > 1 &&
-                    next === currentBg
-                );
+const C = 2 * Math.PI * R;
 
-                currentBg = next;
+progress.style.strokeDasharray = `0 ${C}`;
+progress.style.strokeDashoffset = 0;
 
-                bg.style.opacity = 0;
 
-                setTimeout(() => {
+/* =========================================================
+   TIMER STATE
+========================================================= */
 
-                    bg.src = backgrounds[currentBg];
+let phase = "focus";
 
-                    bg.style.opacity = 1;
+let duration = 25 * 60;
 
-                }, 180);
-            }
+let remaining = duration;
 
-            pickBackground();
+let running = false;
 
+let lastTick = null;
 
-            /* ========================================
-               시간 표시
-               ======================================== */
+let round = 1;
 
-            function format(sec) {
+let timerId = null;
 
-                sec = Math.max(
-                    0,
-                    Math.ceil(sec)
-                );
-
-                return (
-                    String(
-                        Math.floor(sec / 60)
-                    ).padStart(2, "0")
-                    +
-                    ":"
-                    +
-                    String(
-                        sec % 60
-                    ).padStart(2, "0")
-                );
-            }
-
-
-            /* ========================================
-               화면 렌더링
-               ======================================== */
-
-            function render() {
-
-                timeEl.textContent =
-                    format(remaining);
 
-                modeEl.textContent =
-                    phase === "focus"
-                        ? "집중"
-                        : "휴식";
+/* =========================================================
+   AUDIO
+========================================================= */
 
-                sessionEl.textContent =
-                    `ROUND ${round}`;
+let audioCtx = null;
 
-                const ratio =
-                    Math.max(
-                        0,
-                        Math.min(
-                            1,
-                            (duration - remaining)
-                            / duration
-                        )
-                    );
 
-                progress.style.strokeDasharray =
-                    `${C * ratio} ${C}`;
+/* =========================================================
+   BACKGROUND PICKER
+========================================================= */
 
-                progress.style.strokeDashoffset = 0;
+function pickBackground() {
 
-                document.title =
-                    `${format(remaining)} · ${
-                        phase === "focus"
-                            ? "집중"
-                            : "휴식"
-                    }`;
-            }
+  if (backgrounds.length === 0) {
+    return;
+  }
 
+  let next;
 
-            /* ========================================
-               토스트
-               ======================================== */
+  do {
 
-            function showToast(msg) {
+    next = Math.floor(
+      Math.random() * backgrounds.length
+    );
 
-                toast.textContent = msg;
+  } while (
+    backgrounds.length > 1 &&
+    next === currentBg
+  );
 
-                toast.classList.add("show");
+  currentBg = next;
 
-                clearTimeout(showToast.t);
+  bg.style.opacity = 0;
 
-                showToast.t =
-                    setTimeout(
-                        () =>
-                            toast.classList.remove(
-                                "show"
-                            ),
-                        2200
-                    );
-            }
+  setTimeout(() => {
 
+    bg.src = backgrounds[currentBg];
 
-            /* ========================================
-               알림음
-               ======================================== */
+    bg.style.opacity = 1;
 
-            const sounds = {
+  }, 180);
+}
 
-                focusStart:
-                    new Audio(
-                        "sounds/focus-start.wav"
-                    ),
 
-                focusEnd:
-                    new Audio(
-                        "sounds/focus-end.wav"
-                    ),
+pickBackground();
 
-                breakStart:
-                    new Audio(
-                        "sounds/break-start.wav"
-                    ),
 
-                breakEnd:
-                    new Audio(
-                        "sounds/break-end.wav"
-                    ),
+/* =========================================================
+   TIME FORMAT
+========================================================= */
 
-                pause:
-                    new Audio(
-                        "sounds/pause.wav"
-                    )
-            };
+function format(sec) {
 
+  sec = Math.max(
+    0,
+    Math.ceil(sec)
+  );
 
-            Object.values(sounds).forEach(
-                audio => {
+  return (
+    String(Math.floor(sec / 60)).padStart(2, "0")
+    +
+    ":"
+    +
+    String(sec % 60).padStart(2, "0")
+  );
+}
 
-                    audio.preload = "auto";
-                    audio.volume = 1.0;
 
-                }
-            );
+/* =========================================================
+   RENDER
+========================================================= */
 
+function render() {
 
-            function beep(kind) {
+  timeEl.textContent =
+    format(remaining);
 
-                try {
 
-                    const audio =
-                        sounds[kind]
-                        || sounds.focusStart;
+  modeEl.textContent =
+    phase === "focus"
+      ? "집중"
+      : "휴식";
 
-                    audio.currentTime = 0;
 
-                    const p = audio.play();
+  sessionEl.textContent =
+    `ROUND ${round}`;
 
-                    if (p) {
 
-                        p.catch(e =>
-                            console.warn(
-                                "알림음 재생 실패:",
-                                e
-                            )
-                        );
+  /*
+    진행률
 
-                    }
+    0%
+    ↓
+    100%
+  */
 
-                } catch (e) {
+  const ratio =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        (duration - remaining) / duration
+      )
+    );
 
-                    console.warn(
-                        "알림음 재생 실패:",
-                        e
-                    );
 
-                }
-            }
+  progress.style.strokeDasharray =
+    `${C * ratio} ${C}`;
 
 
-            /* ========================================
-               시작
-               ======================================== */
+  progress.style.strokeDashoffset = 0;
 
-            function start() {
 
-                if (running) {
-                    return;
-                }
+  document.title =
+    `${format(remaining)} · ${
+      phase === "focus"
+        ? "집중"
+        : "휴식"
+    }`;
+}
 
-                try {
 
-                    audioCtx =
-                        audioCtx ||
-                        new (
-                            window.AudioContext ||
-                            window.webkitAudioContext
-                        )();
+/* =========================================================
+   TOAST
+========================================================= */
 
-                    if (
-                        audioCtx.state ===
-                        "suspended"
-                    ) {
-                        audioCtx.resume();
-                    }
+function showToast(msg) {
 
-                } catch (e) {}
+  toast.textContent = msg;
 
+  toast.classList.add("show");
 
-                running = true;
+  clearTimeout(showToast.t);
 
-                lastTick =
-                    performance.now();
+  showToast.t =
+    setTimeout(() => {
 
+      toast.classList.remove("show");
 
-                beep(
-                    phase === "focus"
-                        ? "focusStart"
-                        : "breakStart"
-                );
+    }, 2200);
+}
 
 
-                showToast(
-                    phase === "focus"
-                        ? "집중 시작 🍅"
-                        : "휴식 시작 ☕"
-                );
+/* =========================================================
+   SOUNDS
+========================================================= */
 
+const sounds = {
 
-                timerId =
-                    requestAnimationFrame(
-                        tick
-                    );
-            }
+  focusStart:
+    new Audio("sounds/focus-start.wav"),
 
+  focusEnd:
+    new Audio("sounds/focus-end.wav"),
 
-            /* ========================================
-               타이머
-               ======================================== */
+  breakStart:
+    new Audio("sounds/break-start.wav"),
 
-            function tick(now) {
+  breakEnd:
+    new Audio("sounds/break-end.wav"),
 
-                if (!running) {
-                    return;
-                }
+  pause:
+    new Audio("sounds/pause.wav")
+};
 
-                const delta =
-                    (now - lastTick) / 1000;
 
-                lastTick = now;
+Object.values(sounds).forEach(audio => {
 
-                remaining -= delta;
+  audio.preload = "auto";
 
+  audio.volume = 1.0;
 
-                if (remaining <= 0) {
+});
 
-                    remaining = 0;
 
-                    render();
+/* =========================================================
+   PLAY SOUND
+========================================================= */
 
-                    transition();
+function beep(kind) {
 
-                    return;
-                }
+  try {
 
+    const audio =
+      sounds[kind] ||
+      sounds.focusStart;
 
-                render();
+    audio.currentTime = 0;
 
+    const p = audio.play();
 
-                timerId =
-                    requestAnimationFrame(
-                        tick
-                    );
-            }
+    if (p) {
 
+      p.catch(e => {
 
-            /* ========================================
-               일시정지
-               ======================================== */
+        console.warn(
+          "알림음 재생 실패:",
+          e
+        );
 
-            function pause() {
+      });
 
-                if (!running) {
-                    return;
-                }
+    }
 
-                running = false;
+  } catch (e) {
 
-                cancelAnimationFrame(
-                    timerId
-                );
+    console.warn(
+      "알림음 재생 실패:",
+      e
+    );
+  }
+}
 
-                beep("pause");
 
-                showToast("일시정지");
-            }
+/* =========================================================
+   START
+========================================================= */
 
+function start() {
 
-            /* ========================================
-               단계 전환
-               ======================================== */
+  if (running) {
+    return;
+  }
 
-            function transition() {
 
-                running = false;
+  try {
 
-                cancelAnimationFrame(
-                    timerId
-                );
+    audioCtx =
+      audioCtx ||
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
 
+    if (
+      audioCtx.state === "suspended"
+    ) {
 
-                if (phase === "focus") {
+      audioCtx.resume();
+    }
 
-                    beep("focusEnd");
+  } catch (e) {}
 
-                    phase = "break";
 
-                    duration = 5 * 60;
+  running = true;
 
-                    remaining = duration;
+  lastTick =
+    performance.now();
 
-                    showToast(
-                        "집중 끝! 5분 휴식 🌿"
-                    );
 
-                } else {
+  beep(
+    phase === "focus"
+      ? "focusStart"
+      : "breakStart"
+  );
 
-                    beep("breakEnd");
 
-                    phase = "focus";
+  showToast(
+    phase === "focus"
+      ? "집중 시작 🍅"
+      : "휴식 시작 ☕"
+  );
 
-                    duration = 25 * 60;
 
-                    remaining = duration;
+  timerId =
+    requestAnimationFrame(tick);
+}
 
-                    round++;
 
-                    pickBackground();
+/* =========================================================
+   TICK
+========================================================= */
 
-                    showToast(
-                        "휴식 끝! 다시 집중 🍅"
-                    );
-                }
+function tick(now) {
 
+  if (!running) {
+    return;
+  }
 
-                render();
 
+  const delta =
+    (now - lastTick) / 1000;
 
-                /* 자동으로 다음 단계 시작 */
-                start();
-            }
 
+  lastTick = now;
 
-            /* ========================================
-               다음 단계
-               ======================================== */
+  remaining -= delta;
 
-            function skip() {
-                transition();
-            }
 
+  if (remaining <= 0) {
 
-            /* ========================================
-               처음부터
-               ======================================== */
+    remaining = 0;
 
-            function reset() {
+    render();
 
-                running = false;
+    transition();
 
-                cancelAnimationFrame(
-                    timerId
-                );
+    return;
+  }
 
-                phase = "focus";
 
-                duration = 25 * 60;
+  render();
 
-                remaining = duration;
+  timerId =
+    requestAnimationFrame(tick);
+}
 
-                round = 1;
 
-                pickBackground();
+/* =========================================================
+   PAUSE
+========================================================= */
 
-                render();
+function pause() {
 
-                showToast(
-                    "처음부터 시작"
-                );
-            }
+  if (!running) {
+    return;
+  }
 
 
-            /* ========================================
-               버튼
-               ======================================== */
+  running = false;
 
-            document.getElementById(
-                "start"
-            ).onclick = start;
+  cancelAnimationFrame(timerId);
 
-            document.getElementById(
-                "pause"
-            ).onclick = pause;
+  beep("pause");
 
-            document.getElementById(
-                "skip"
-            ).onclick = skip;
+  showToast("일시정지");
+}
 
-            document.getElementById(
-                "reset"
-            ).onclick = reset;
 
+/* =========================================================
+   TRANSITION
+========================================================= */
 
-            /* ========================================
-               초기 화면
-               ======================================== */
+function transition() {
 
-            render();
+  running = false;
 
-        </script>
+  cancelAnimationFrame(timerId);
 
-    </body>
+
+  if (phase === "focus") {
+
+    /*
+      집중 종료
+    */
+
+    beep("focusEnd");
+
+    phase = "break";
+
+    duration = 5 * 60;
+
+    remaining = duration;
+
+    showToast(
+      "집중 끝! 5분 휴식 🌿"
+    );
+
+  } else {
+
+    /*
+      휴식 종료
+    */
+
+    beep("breakEnd");
+
+    phase = "focus";
+
+    duration = 25 * 60;
+
+    remaining = duration;
+
+    round++;
+
+    pickBackground();
+
+    showToast(
+      "휴식 끝! 다시 집중 🍅"
+    );
+  }
+
+
+  render();
+
+  start();
+}
+
+
+/* =========================================================
+   SKIP
+========================================================= */
+
+function skip() {
+
+  transition();
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function reset() {
+
+  running = false;
+
+  cancelAnimationFrame(timerId);
+
+  phase = "focus";
+
+  duration = 25 * 60;
+
+  remaining = duration;
+
+  round = 1;
+
+  pickBackground();
+
+  render();
+
+  showToast(
+    "처음부터 시작"
+  );
+}
+
+
+/* =========================================================
+   BUTTON EVENTS
+========================================================= */
+
+document
+  .getElementById("start")
+  .onclick = start;
+
+document
+  .getElementById("pause")
+  .onclick = pause;
+
+document
+  .getElementById("skip")
+  .onclick = skip;
+
+document
+  .getElementById("reset")
+  .onclick = reset;
+
+
+/* =========================================================
+   INITIAL RENDER
+========================================================= */
+
+render();
+
+</script>
+
+</body>
 </html>
