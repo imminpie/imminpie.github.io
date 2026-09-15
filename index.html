@@ -1,2503 +1,1319 @@
 <!doctype html>
 <html lang="ko">
+  <head>
+    <meta charset="utf-8" />
 
-<head>
-<meta charset="utf-8">
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,viewport-fit=cover"
->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-<meta
-  name="referrer"
-  content="strict-origin-when-cross-origin"
->
+    <title>Cozy Pomodoro</title>
 
-<title>Cozy Pomodoro</title>
+    <!-- YouTube IFrame Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
-<!-- YouTube IFrame Player API -->
-<script src="https://www.youtube.com/iframe_api"></script>
+    <style>
+      :root {
+        --white: rgba(255, 255, 255, 0.94);
+      }
 
+      * {
+        box-sizing: border-box;
+      }
 
-<style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, "Noto Sans KR", sans-serif;
+      }
 
-:root {
-  --white: rgba(255,255,255,.94);
-}
+      body {
+        background: #222;
+        color: white;
+      }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-  font-family: Arial, "Noto Sans KR", sans-serif;
-}
-
-body {
-  background: #222;
-  color: white;
-}
-
-
-/* =========================
+      /* =========================================================
    BACKGROUND
-========================= */
+========================================================= */
 
-#bg {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -3;
-  transition: opacity .6s;
-}
+      #bg {
+        position: fixed;
+        inset: 0;
 
-#shade {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.16);
-  z-index: -2;
-}
+        width: 100%;
+        height: 100%;
 
+        object-fit: cover;
 
-/* =========================
+        z-index: -3;
+
+        transition: opacity 0.6s;
+      }
+
+      #shade {
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.16);
+
+        z-index: -2;
+      }
+
+      /* =========================================================
    MAIN
-========================= */
+========================================================= */
 
-.wrap {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
+      .wrap {
+        width: 100%;
+        height: 100%;
 
-.timerBox {
-  width: 100%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+        display: flex;
 
+        align-items: center;
+        justify-content: center;
 
-/* =========================
+        padding: 24px;
+      }
+
+      .timerBox {
+        width: 100%;
+
+        text-align: center;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+      }
+
+      /* =========================================================
    TIMER RING
-========================= */
+========================================================= */
 
-.ring {
-  width: min(52vh, 430px);
-  height: min(52vh, 430px);
-  position: relative;
-  display: grid;
-  place-items: center;
-}
+      .ring {
+        width: min(52vh, 430px);
+        height: min(52vh, 430px);
 
-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
+        position: relative;
 
-.track {
-  fill: none;
-  stroke: rgba(255,255,255,.32);
-  stroke-width: 5;
-}
+        display: grid;
+        place-items: center;
+      }
 
-.progress {
-  fill: none;
-  stroke: white;
-  stroke-width: 5;
-  stroke-linecap: round;
-  transition: stroke-dasharray .25s linear;
-}
+      svg {
+        position: absolute;
 
+        inset: 0;
 
-/* =========================
+        width: 100%;
+        height: 100%;
+
+        transform: rotate(-90deg);
+      }
+
+      .track {
+        fill: none;
+
+        stroke: rgba(255, 255, 255, 0.32);
+
+        stroke-width: 5;
+      }
+
+      .progress {
+        fill: none;
+
+        stroke: white;
+
+        stroke-width: 5;
+
+        stroke-linecap: round;
+
+        transition: stroke-dasharray 0.25s linear;
+      }
+
+      /* =========================================================
    TIME
-========================= */
+========================================================= */
 
-.time {
-  font-size: clamp(58px, 9vw, 104px);
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 12px rgba(0,0,0,.28);
-  white-space: nowrap;
-}
+      .time {
+        font-size: clamp(58px, 9vw, 104px);
 
-.mode {
-  margin-top: 10px;
-  font-size: 15px;
-  letter-spacing: 4px;
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0,0,0,.35);
-}
+        font-weight: 700;
 
+        letter-spacing: 2px;
 
-/* =========================
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+
+        white-space: nowrap;
+      }
+
+      .mode {
+        margin-top: 10px;
+
+        font-size: 15px;
+
+        letter-spacing: 4px;
+
+        font-weight: 700;
+
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      }
+
+      /* =========================================================
    MUSIC TITLE
-========================= */
+========================================================= */
 
-.musicInfo {
-  width: min(360px, 80vw);
-  margin-top: 14px;
+      .musicInfo {
+        width: min(360px, 80vw);
 
-  min-height: 20px;
+        margin-top: 14px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+        min-height: 20px;
 
-  gap: 6px;
+        display: flex;
 
-  font-size: 13px;
-  line-height: 1.4;
+        align-items: center;
 
-  color: rgba(255,255,255,.88);
+        justify-content: center;
 
-  text-shadow:
-    0 2px 8px rgba(0,0,0,.35);
+        gap: 6px;
 
-  overflow: hidden;
-}
+        font-size: 13px;
 
-.musicIcon {
-  flex: 0 0 auto;
-  font-size: 12px;
-}
+        line-height: 1.4;
 
-#musicTitle {
-  min-width: 0;
+        color: rgba(255, 255, 255, 0.88);
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 
+        overflow: hidden;
+      }
 
-/* =========================
+      .musicIcon {
+        flex: 0 0 auto;
+
+        font-size: 12px;
+      }
+
+      #musicTitle {
+        min-width: 0;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+      }
+
+      /* =========================================================
    BUTTONS
-========================= */
+========================================================= */
 
-.controls {
-  width: 100%;
-  margin-top: 24px;
+      .controls {
+        width: 100%;
 
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+        margin-top: 24px;
 
-  gap: 9px;
+        display: flex;
 
-  justify-content: center;
-  align-items: center;
+        flex-direction: row;
 
-  max-width: 100%;
-}
+        flex-wrap: wrap;
 
-button {
-  border: 1px solid rgba(255,255,255,.55);
+        gap: 9px;
 
-  background: rgba(255,255,255,.18);
+        justify-content: center;
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+        align-items: center;
 
-  color: white;
+        max-width: 100%;
+      }
 
-  border-radius: 999px;
+      button {
+        border: 1px solid rgba(255, 255, 255, 0.55);
 
-  padding: 10px 17px;
+        background: rgba(255, 255, 255, 0.18);
 
-  font-size: 14px;
+        backdrop-filter: blur(8px);
 
-  cursor: pointer;
+        -webkit-backdrop-filter: blur(8px);
 
-  white-space: nowrap;
+        color: white;
 
-  -webkit-tap-highlight-color: transparent;
+        border-radius: 999px;
 
-  transition:
-    background .15s,
-    transform .1s;
-}
+        padding: 10px 17px;
 
-button:hover {
-  background: rgba(255,255,255,.30);
-}
+        font-size: 14px;
 
-button:active {
-  background: rgba(255,255,255,.36);
-  transform: scale(.97);
-}
+        cursor: pointer;
 
+        white-space: nowrap;
 
-/* =========================
+        -webkit-tap-highlight-color: transparent;
+
+        transition:
+          background 0.15s,
+          transform 0.1s;
+      }
+
+      button:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      button:active {
+        background: rgba(255, 255, 255, 0.36);
+
+        transform: scale(0.97);
+      }
+
+      /* =========================================================
    ROUND BADGE
-========================= */
+========================================================= */
 
-.badge {
-  position: fixed;
+      .badge {
+        position: fixed;
 
-  top: 18px;
-  left: 18px;
+        top: 18px;
+        left: 18px;
 
-  padding: 7px 11px;
+        padding: 7px 11px;
 
-  border-radius: 999px;
+        border-radius: 999px;
 
-  background: rgba(0,0,0,.25);
+        background: rgba(0, 0, 0, 0.25);
 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
 
-  font-size: 12px;
+        -webkit-backdrop-filter: blur(8px);
 
-  z-index: 5;
-}
+        font-size: 12px;
 
+        z-index: 5;
+      }
 
-/* =========================
-   MUSIC SETTING BUTTON
-========================= */
-
-.musicButton {
-  position: fixed;
-
-  top: 18px;
-  right: 18px;
-
-  z-index: 6;
-}
-
-
-/* =========================
+      /* =========================================================
    HIDDEN YOUTUBE PLAYER
-========================= */
+========================================================= */
 
-/*
-  YouTube API가 작동하기 위한 플레이어입니다.
-  사용자 화면에는 표시하지 않습니다.
-*/
+      #youtubePlayer {
+        position: fixed;
 
-#youtubePlayer {
-  position: fixed;
+        width: 1px;
+        height: 1px;
 
-  width: 1px;
-  height: 1px;
+        left: -10px;
+        bottom: -10px;
 
-  left: -10px;
-  bottom: -10px;
+        opacity: 0;
 
-  opacity: 0;
+        pointer-events: none;
+      }
 
-  pointer-events: none;
-}
-
-
-/* =========================
+      /* =========================================================
    TOAST
-========================= */
+========================================================= */
 
-#toast {
-  position: fixed;
+      #toast {
+        position: fixed;
 
-  top: 18px;
-  left: 50%;
+        top: 18px;
+        left: 50%;
 
-  transform:
-    translateX(-50%)
-    translateY(-20px);
+        transform: translateX(-50%) translateY(-20px);
 
-  opacity: 0;
+        opacity: 0;
 
-  transition: .35s;
+        transition: 0.35s;
 
-  padding: 10px 16px;
+        padding: 10px 16px;
 
-  border-radius: 999px;
+        border-radius: 999px;
 
-  background: rgba(0,0,0,.55);
+        background: rgba(0, 0, 0, 0.55);
 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
 
-  font-size: 13px;
+        -webkit-backdrop-filter: blur(10px);
 
-  pointer-events: none;
+        font-size: 13px;
 
-  white-space: nowrap;
+        pointer-events: none;
 
-  z-index: 10;
-}
+        white-space: nowrap;
 
-#toast.show {
-  opacity: 1;
+        z-index: 10;
+      }
 
-  transform:
-    translateX(-50%)
-    translateY(0);
-}
+      #toast.show {
+        opacity: 1;
 
+        transform: translateX(-50%) translateY(0);
+      }
 
-/* =========================
-   MUSIC MODAL
-========================= */
-
-#musicModal {
-  position: fixed;
-
-  inset: 0;
-
-  display: none;
-
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0,0,0,.48);
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-
-  z-index: 20;
-
-  padding: 20px;
-}
-
-#musicModal.show {
-  display: flex;
-}
-
-.modalBox {
-  width: min(460px, 100%);
-
-  padding: 24px;
-
-  border-radius: 22px;
-
-  background: rgba(35,35,35,.82);
-
-  border: 1px solid rgba(255,255,255,.25);
-
-  box-shadow:
-    0 20px 60px rgba(0,0,0,.35);
-}
-
-.modalTitle {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.modalDescription {
-  font-size: 13px;
-
-  line-height: 1.6;
-
-  color: rgba(255,255,255,.72);
-
-  margin-bottom: 18px;
-}
-
-.playlistInput {
-  width: 100%;
-
-  border: 1px solid rgba(255,255,255,.3);
-
-  outline: none;
-
-  background: rgba(255,255,255,.12);
-
-  color: white;
-
-  border-radius: 12px;
-
-  padding: 13px 14px;
-
-  font-size: 14px;
-}
-
-.playlistInput::placeholder {
-  color: rgba(255,255,255,.45);
-}
-
-.modalButtons {
-  display: flex;
-
-  gap: 8px;
-
-  justify-content: flex-end;
-
-  margin-top: 14px;
-}
-
-.musicInfoModal {
-  margin-top: 10px;
-
-  font-size: 11px;
-
-  color: rgba(255,255,255,.6);
-
-  word-break: break-all;
-}
-
-
-/* =========================================================
+      /* =========================================================
    MOBILE
 ========================================================= */
 
-@media (max-width: 600px) {
+      @media (max-width: 600px) {
+        .wrap {
+          padding: max(16px, env(safe-area-inset-top))
+            max(16px, env(safe-area-inset-right))
+            max(16px, env(safe-area-inset-bottom))
+            max(16px, env(safe-area-inset-left));
+        }
 
-  .wrap {
-    padding:
-      max(16px, env(safe-area-inset-top))
-      max(16px, env(safe-area-inset-right))
-      max(16px, env(safe-area-inset-bottom))
-      max(16px, env(safe-area-inset-left));
-  }
+        .timerBox {
+          width: 100%;
+        }
 
-  .timerBox {
-    width: 100%;
-  }
+        .ring {
+          width: min(66vw, 290px);
 
+          height: min(66vw, 290px);
+        }
 
-  /* 원형 타이머 크기 */
+        .time {
+          font-size: clamp(48px, 14vw, 72px);
 
-  .ring {
-    width: min(66vw, 290px);
-    height: min(66vw, 290px);
-  }
+          letter-spacing: 1px;
+        }
 
+        .mode {
+          margin-top: 5px;
 
-  /* 시간 */
+          font-size: 12px;
 
-  .time {
-    font-size: clamp(48px, 14vw, 72px);
-    letter-spacing: 1px;
-  }
+          letter-spacing: 3px;
+        }
 
-  .mode {
-    margin-top: 5px;
+        .musicInfo {
+          width: min(300px, 80vw);
 
-    font-size: 12px;
+          margin-top: 10px;
 
-    letter-spacing: 3px;
-  }
+          font-size: 11px;
+        }
 
+        .controls {
+          width: 100%;
 
-  /* 음악 제목 */
+          margin-top: 10px;
 
-  .musicInfo {
-    width: min(300px, 80vw);
+          padding: 0;
 
-    margin-top: 10px;
+          display: flex;
 
-    font-size: 11px;
-  }
+          flex-direction: row;
 
+          flex-wrap: wrap;
 
-  /* 버튼 */
+          justify-content: center;
 
-  .controls {
-    width: 100%;
+          align-items: center;
 
-    margin-top: 10px;
+          gap: 6px;
+        }
 
-    padding: 0;
+        button {
+          width: auto;
 
-    display: flex;
+          min-height: 34px;
 
-    flex-direction: row;
+          padding: 7px 14px;
 
-    flex-wrap: wrap;
+          font-size: 12px;
 
-    justify-content: center;
+          line-height: 1.2;
+        }
 
-    align-items: center;
+        .badge {
+          top: max(10px, env(safe-area-inset-top));
 
-    gap: 6px;
-  }
+          left: max(10px, env(safe-area-inset-left));
 
-  button {
-    width: auto;
+          padding: 6px 9px;
 
-    min-height: 34px;
+          font-size: 11px;
+        }
 
-    padding: 7px 14px;
+        #toast {
+          top: max(10px, env(safe-area-inset-top));
 
-    font-size: 12px;
+          max-width: calc(100vw - 32px);
 
-    line-height: 1.2;
-  }
+          padding: 8px 13px;
 
+          font-size: 12px;
 
-  /* ROUND */
+          overflow: hidden;
 
-  .badge {
-    top: max(10px, env(safe-area-inset-top));
+          text-overflow: ellipsis;
+        }
+      }
 
-    left: max(10px, env(safe-area-inset-left));
-
-    padding: 6px 9px;
-
-    font-size: 11px;
-  }
-
-
-  /* 음악 설정 */
-
-  .musicButton {
-    top: max(10px, env(safe-area-inset-top));
-
-    right: max(10px, env(safe-area-inset-right));
-
-    padding: 7px 11px;
-
-    font-size: 11px;
-  }
-
-
-  /* Toast */
-
-  #toast {
-    top: max(10px, env(safe-area-inset-top));
-
-    max-width: calc(100vw - 32px);
-
-    padding: 8px 13px;
-
-    font-size: 12px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-  }
-}
-
-
-/* =========================================================
+      /* =========================================================
    VERY SMALL PHONE
 ========================================================= */
 
-@media (max-width: 380px) {
+      @media (max-width: 380px) {
+        .wrap {
+          padding: 12px;
+        }
 
-  .wrap {
-    padding: 12px;
-  }
+        .ring {
+          width: min(60vw, 250px);
 
+          height: min(60vw, 250px);
+        }
 
-  /* 원형 */
+        .time {
+          font-size: clamp(42px, 13vw, 60px);
+        }
 
-  .ring {
-    width: min(60vw, 250px);
-    height: min(60vw, 250px);
-  }
+        .mode {
+          margin-top: 4px;
 
+          font-size: 11px;
 
-  .time {
-    font-size: clamp(42px, 13vw, 60px);
-  }
+          letter-spacing: 2.5px;
+        }
 
+        .musicInfo {
+          margin-top: 8px;
 
-  .mode {
-    margin-top: 4px;
+          font-size: 10px;
+        }
 
-    font-size: 11px;
+        .controls {
+          margin-top: 7px;
 
-    letter-spacing: 2.5px;
-  }
+          gap: 5px;
+        }
 
+        button {
+          width: auto;
 
-  .musicInfo {
-    margin-top: 8px;
-    font-size: 10px;
-  }
+          min-height: 32px;
 
+          padding: 6px 12px;
 
-  .controls {
-    margin-top: 7px;
+          font-size: 11px;
+        }
+      }
 
-    gap: 5px;
-  }
-
-  button {
-    width: auto;
-
-    min-height: 32px;
-
-    padding: 6px 12px;
-
-    font-size: 11px;
-  }
-}
-
-
-/* =========================================================
+      /* =========================================================
    MOBILE LANDSCAPE
 ========================================================= */
 
-@media (max-width: 900px) and (orientation: landscape) {
+      @media (max-width: 900px) and (orientation: landscape) {
+        .wrap {
+          padding: 10px 16px;
+        }
 
-  .wrap {
-    padding: 10px 16px;
-  }
+        .timerBox {
+          transform: scale(0.72);
+        }
 
-  .timerBox {
-    transform: scale(.72);
-  }
+        .ring {
+          width: min(58vh, 280px);
 
+          height: min(58vh, 280px);
+        }
 
-  /* 가로 화면 원 */
+        .musicInfo {
+          margin-top: 7px;
+        }
 
-  .ring {
-    width: min(58vh, 280px);
-    height: min(58vh, 280px);
-  }
+        .controls {
+          margin-top: 8px;
 
+          display: flex;
 
-  .musicInfo {
-    margin-top: 7px;
-  }
+          flex-direction: row;
 
+          flex-wrap: wrap;
 
-  /* 버튼 */
+          justify-content: center;
 
-  .controls {
-    margin-top: 8px;
+          align-items: center;
 
-    display: flex;
+          gap: 5px;
+        }
 
-    flex-direction: row;
+        button {
+          width: auto;
 
-    flex-wrap: wrap;
+          min-height: 30px;
 
-    justify-content: center;
+          padding: 6px 12px;
 
-    align-items: center;
+          font-size: 11px;
+        }
 
-    gap: 5px;
-  }
+        .badge {
+          top: 8px;
+          left: 8px;
+        }
 
-  button {
-    width: auto;
+        #toast {
+          top: 8px;
+        }
+      }
+    </style>
+  </head>
 
-    min-height: 30px;
-
-    padding: 6px 12px;
-
-    font-size: 11px;
-  }
-
-
-  .badge {
-    top: 8px;
-    left: 8px;
-  }
-
-  #toast {
-    top: 8px;
-  }
-
-
-  .musicButton {
-    top: 8px;
-    right: 8px;
-  }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<!-- =========================
+  <body>
+    <!-- =======================================================
      BACKGROUND
-========================= -->
+======================================================== -->
 
-<img
-  id="bg"
-  alt=""
->
+    <img id="bg" alt="" />
 
-<div id="shade"></div>
+    <div id="shade"></div>
 
-
-<!-- =========================
+    <!-- =======================================================
      ROUND
-========================= -->
+======================================================== -->
 
-<div
-  class="badge"
-  id="session"
->
-  ROUND 1
-</div>
+    <div class="badge" id="session">ROUND 1</div>
 
-
-<!-- =========================
-     MUSIC SETTING
-========================= -->
-
-<button
-  class="musicButton"
-  id="musicSetting"
->
-  🎵 음악 설정
-</button>
-
-
-<!-- =========================
+    <!-- =======================================================
      TOAST
-========================= -->
+======================================================== -->
 
-<div id="toast"></div>
+    <div id="toast"></div>
 
+    <!-- =======================================================
+     YOUTUBE PLAYER
+======================================================== -->
 
-<!-- =========================
-     HIDDEN YOUTUBE PLAYER
-========================= -->
+    <div id="youtubePlayer"></div>
 
-<div id="youtubePlayer"></div>
-
-
-<!-- =========================
+    <!-- =======================================================
      TIMER
-========================= -->
+======================================================== -->
 
-<div class="wrap">
+    <div class="wrap">
+      <div class="timerBox">
+        <!-- TIMER -->
 
-  <div class="timerBox">
+        <div class="ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="track" cx="100" cy="100" r="92"></circle>
 
+            <circle
+              class="progress"
+              id="progress"
+              cx="100"
+              cy="100"
+              r="92"
+            ></circle>
+          </svg>
 
-    <!-- TIMER RING -->
+          <div>
+            <div class="time" id="time">25:00</div>
 
-    <div class="ring">
-
-      <svg
-        viewBox="0 0 200 200"
-        aria-hidden="true"
-      >
-
-        <!-- 전체 원 -->
-
-        <circle
-          class="track"
-          cx="100"
-          cy="100"
-          r="92"
-        ></circle>
-
-
-        <!-- 진행 원 -->
-
-        <circle
-          class="progress"
-          id="progress"
-          cx="100"
-          cy="100"
-          r="92"
-        ></circle>
-
-      </svg>
-
-
-      <div>
-
-        <div
-          class="time"
-          id="time"
-        >
-          25:00
+            <div class="mode" id="mode">집중</div>
+          </div>
         </div>
 
-        <div
-          class="mode"
-          id="mode"
-        >
-          집중
+        <!-- =================================================
+         CURRENT MUSIC TITLE
+    ================================================== -->
+
+        <div class="musicInfo" id="musicInfo">
+          <span class="musicIcon"> ♫ </span>
+
+          <span id="musicTitle"> 음악 준비 중... </span>
         </div>
 
-      </div>
-
-    </div>
-
-
-    <!-- =========================
-         MUSIC TITLE
-    ========================= -->
-
-    <div
-      class="musicInfo"
-      id="musicInfo"
-    >
-
-      <span class="musicIcon">
-        ♫
-      </span>
-
-      <span id="musicTitle">
-        음악을 설정해주세요
-      </span>
-
-    </div>
-
-
-    <!-- =========================
+        <!-- =================================================
          CONTROLS
-    ========================= -->
+    ================================================== -->
 
-    <div class="controls">
+        <div class="controls">
+          <button id="start">▶ 시작</button>
 
-      <button id="start">
-        ▶ 시작
-      </button>
+          <button id="pause">Ⅱ 일시정지</button>
 
-      <button id="pause">
-        Ⅱ 일시정지
-      </button>
+          <button id="skip">다음 단계 →</button>
 
-      <button id="skip">
-        다음 단계 →
-      </button>
-
-      <button id="reset">
-        ↻ 처음부터
-      </button>
-
+          <button id="reset">↻ 처음부터</button>
+        </div>
+      </div>
     </div>
 
-  </div>
+    <script>
+      /* =========================================================
+   ★ FIXED YOUTUBE PLAYLIST
+========================================================= */
 
-</div>
+      const PLAYLIST_ID = "PLYPZ0oNM1h6E";
 
-
-<!-- =========================
-     MUSIC MODAL
-========================= -->
-
-<div id="musicModal">
-
-  <div class="modalBox">
-
-    <div class="modalTitle">
-      🎵 YouTube 음악 설정
-    </div>
-
-
-    <div class="modalDescription">
-
-      집중할 때 재생할 YouTube
-      플레이리스트 주소를 입력하세요.<br>
-
-      25분 집중이 끝나면 음악이 자동으로
-      일시정지되고, 5분 휴식이 끝나면
-      다시 재생됩니다.
-
-    </div>
-
-
-    <input
-      class="playlistInput"
-      id="playlistInput"
-      type="text"
-      placeholder="https://www.youtube.com/playlist?list=..."
-      autocomplete="off"
-    >
-
-
-    <div
-      class="musicInfoModal"
-      id="musicInfoModal"
-    >
-      아직 플레이리스트가 설정되지 않았습니다.
-    </div>
-
-
-    <div class="modalButtons">
-
-      <button id="cancelMusic">
-        취소
-      </button>
-
-      <button id="saveMusic">
-        저장
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<script>
-
-
-/* =========================================================
+      /* =========================================================
    BACKGROUNDS
 ========================================================= */
 
-const BUILTIN = [
+      const BUILTIN = [
+        "backgrounds/bg1.jpg",
 
-  "backgrounds/bg1.jpg",
+        "backgrounds/bg2.jpg",
 
-  "backgrounds/bg2.jpg",
+        "backgrounds/bg3.jpg",
+      ];
 
-  "backgrounds/bg3.jpg"
+      let backgrounds = [...BUILTIN];
 
-];
+      let currentBg = -1;
 
+      /* =========================================================
+   ELEMENTS
+========================================================= */
 
-let backgrounds = [...BUILTIN];
+      const bg = document.getElementById("bg");
 
-let currentBg = -1;
+      const timeEl = document.getElementById("time");
 
+      const modeEl = document.getElementById("mode");
 
-const bg =
-  document.getElementById("bg");
+      const progress = document.getElementById("progress");
 
-const timeEl =
-  document.getElementById("time");
+      const sessionEl = document.getElementById("session");
 
-const modeEl =
-  document.getElementById("mode");
+      const toast = document.getElementById("toast");
 
-const progress =
-  document.getElementById("progress");
+      const musicTitleEl = document.getElementById("musicTitle");
 
-const sessionEl =
-  document.getElementById("session");
-
-const toast =
-  document.getElementById("toast");
-
-const musicTitleEl =
-  document.getElementById("musicTitle");
-
-
-/* =========================================================
+      /* =========================================================
    CIRCLE
 ========================================================= */
 
-const R = 92;
+      const R = 92;
 
-const C =
-  2 * Math.PI * R;
+      const C = 2 * Math.PI * R;
 
+      progress.style.strokeDasharray = `0 ${C}`;
 
-progress.style.strokeDasharray =
-  `0 ${C}`;
+      progress.style.strokeDashoffset = 0;
 
-progress.style.strokeDashoffset = 0;
-
-
-/* =========================================================
+      /* =========================================================
    TIMER STATE
 ========================================================= */
 
-let phase = "focus";
+      let phase = "focus";
 
-let duration = 25 * 60;
+      let duration = 25 * 60;
 
-let remaining = duration;
+      let remaining = duration;
 
-let running = false;
+      let running = false;
 
-let lastTick = null;
+      let lastTick = null;
 
-let round = 1;
+      let round = 1;
 
-let timerId = null;
+      let timerId = null;
 
-
-/* =========================================================
+      /* =========================================================
    AUDIO
 ========================================================= */
 
-let audioCtx = null;
+      let audioCtx = null;
 
-
-/* =========================================================
+      /* =========================================================
    YOUTUBE
 ========================================================= */
 
-let ytPlayer = null;
+      let ytPlayer = null;
 
-let youtubeReady = false;
+      let youtubeReady = false;
 
-let playlistId =
-  localStorage.getItem(
-    "cozyPomodoroPlaylist"
-  ) || "";
-
-
-/* =========================================================
+      /* =========================================================
    MUSIC TITLE
 ========================================================= */
 
-function setMusicTitle(title) {
+      function setMusicTitle(title) {
+        if (!title) {
+          musicTitleEl.textContent = "음악 준비 중...";
 
-  if (!title) {
+          return;
+        }
 
-    musicTitleEl.textContent =
-      "음악을 설정해주세요";
+        musicTitleEl.textContent = title;
+      }
 
-    return;
-
-  }
-
-  musicTitleEl.textContent =
-    title;
-
-}
-
-
-/* =========================================================
-   EXTRACT PLAYLIST ID
-========================================================= */
-
-function extractPlaylistId(value) {
-
-  if (!value) {
-    return "";
-  }
-
-
-  value =
-    value.trim();
-
-
-  /*
-    플레이리스트 ID만 입력한 경우
-
-    PLxxxxxxxx
-  */
-
-  if (
-    !value.includes("youtube.com") &&
-    !value.includes("youtu.be") &&
-    value.startsWith("PL")
-  ) {
-
-    return value;
-
-  }
-
-
-  /*
-    YouTube URL
-
-    https://www.youtube.com/playlist?list=PLxxxx
-  */
-
-  try {
-
-    const url =
-      new URL(value);
-
-    const id =
-      url.searchParams.get("list");
-
-    if (id) {
-
-      return id;
-
-    }
-
-  } catch (e) {
-
-    console.warn(
-      "YouTube URL 분석 실패:",
-      e
-    );
-
-  }
-
-
-  /*
-    혹시 URL 파싱이 안 될 경우
-  */
-
-  const match =
-    value.match(
-      /[?&]list=([^&]+)/i
-    );
-
-
-  if (match) {
-
-    return match[1];
-
-  }
-
-
-  return "";
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    YOUTUBE API READY
 ========================================================= */
 
-function onYouTubeIframeAPIReady() {
+      function onYouTubeIframeAPIReady() {
+        ytPlayer = new YT.Player("youtubePlayer", {
+          width: "1",
 
-  ytPlayer =
-    new YT.Player(
-      "youtubePlayer",
-      {
+          height: "1",
 
-        width: "1",
-        height: "1",
+          playerVars: {
+            autoplay: 0,
 
-        playerVars: {
+            controls: 0,
 
-          autoplay: 0,
+            rel: 0,
 
-          controls: 0,
+            modestbranding: 1,
 
-          rel: 0,
+            playsinline: 1,
+          },
 
-          modestbranding: 1,
-
-          playsinline: 1
-
-        },
-
-
-        events: {
-
-          onReady:
-            function() {
-
+          events: {
+            onReady: function () {
               youtubeReady = true;
 
+              console.log("YouTube 플레이어 준비 완료");
 
-              console.log(
-                "YouTube 플레이어 준비 완료"
-              );
+              /*
+                고정 플레이리스트 로드
 
+                처음에는 자동 재생하지 않습니다.
+              */
 
-              if (playlistId) {
-
-                loadPlaylist(
-                  playlistId,
-                  false
-                );
-
-              } else {
-
-                setMusicTitle(
-                  ""
-                );
-
-              }
-
+              loadPlaylist();
             },
 
-
-          onStateChange:
-            function(event) {
-
-              handleYoutubeState(
-                event
-              );
-
+            onStateChange: function (event) {
+              handleYoutubeState(event);
             },
 
+            onError: function (event) {
+              console.warn("YouTube 오류:", event.data);
 
-          onError:
-            function(event) {
-
-              console.warn(
-                "YouTube 오류:",
-                event.data
-              );
-
-
-              if (
-                playlistId
-              ) {
-
-                showToast(
-                  "YouTube 음악을 재생할 수 없습니다"
-                );
-
-              }
-
-            }
-
-        }
-
+              setMusicTitle("음악을 재생할 수 없습니다");
+            },
+          },
+        });
       }
-    );
 
-}
-
-
-/*
-  YouTube API가 직접 호출할 수 있도록
+      /*
+  YouTube API가 이 함수를 찾을 수 있도록
   전역에 등록
 */
 
-window.onYouTubeIframeAPIReady =
-  onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 
-
-/* =========================================================
-   YOUTUBE STATE CHANGE
+      /* =========================================================
+   LOAD FIXED PLAYLIST
 ========================================================= */
 
-function handleYoutubeState(event) {
+      function loadPlaylist() {
+        if (!youtubeReady || !ytPlayer) {
+          return;
+        }
 
-  if (
-    !window.YT ||
-    !YT.PlayerState
-  ) {
+        try {
+          ytPlayer.cuePlaylist({
+            listType: "playlist",
 
-    return;
+            list: PLAYLIST_ID,
 
-  }
+            index: 0,
 
+            startSeconds: 0,
+          });
 
-  /*
+          setMusicTitle("음악 준비 완료");
+        } catch (e) {
+          console.error("플레이리스트 로드 실패:", e);
+        }
+      }
+
+      /* =========================================================
+   YOUTUBE STATE
+========================================================= */
+
+      function handleYoutubeState(event) {
+        if (!window.YT || !YT.PlayerState) {
+          return;
+        }
+
+        /*
     재생 시작
   */
 
-  if (
-    event.data ===
-    YT.PlayerState.PLAYING
-  ) {
+        if (event.data === YT.PlayerState.PLAYING) {
+          updateCurrentVideoTitle();
 
-    updateCurrentVideoTitle();
-
-  }
-
-
-  /*
-    영상이 끝났을 때
-
-    플레이리스트 다음 곡으로
-    자동으로 넘어갑니다.
-
-    YouTube 플레이리스트 자체의
-    동작에 맡깁니다.
-  */
-
-  if (
-    event.data ===
-    YT.PlayerState.ENDED
-  ) {
-
-    setTimeout(
-      updateCurrentVideoTitle,
-      500
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   UPDATE CURRENT VIDEO TITLE
-========================================================= */
-
-function updateCurrentVideoTitle() {
-
-  if (
-    !ytPlayer ||
-    !youtubeReady
-  ) {
-
-    return;
-
-  }
-
-
-  try {
-
-    const data =
-      ytPlayer.getVideoData();
-
-
-    if (
-      data &&
-      data.title
-    ) {
-
-      setMusicTitle(
-        data.title
-      );
-
-    }
-
-  } catch (e) {
-
-    console.warn(
-      "노래 제목을 가져올 수 없습니다:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   LOAD PLAYLIST
-========================================================= */
-
-function loadPlaylist(
-  id,
-  showMessage = true
-) {
-
-  if (!id) {
-    return;
-  }
-
-
-  playlistId = id;
-
-
-  localStorage.setItem(
-    "cozyPomodoroPlaylist",
-    id
-  );
-
-
-  if (
-    !youtubeReady ||
-    !ytPlayer
-  ) {
-
-    return;
-
-  }
-
-
-  try {
-
-    /*
-      플레이리스트를 불러옵니다.
-
-      자동 재생은 하지 않습니다.
+          /*
+      API가 제목 정보를 준비할 시간을
+      조금 더 줍니다.
     */
 
-    ytPlayer.cuePlaylist({
+          setTimeout(updateCurrentVideoTitle, 300);
 
-      listType: "playlist",
+          setTimeout(updateCurrentVideoTitle, 1000);
+        }
 
-      list: id,
+        /*
+    다음 곡으로 넘어간 경우
+  */
 
-      index: 0,
+        if (event.data === YT.PlayerState.ENDED) {
+          setTimeout(updateCurrentVideoTitle, 500);
+        }
+      }
 
-      startSeconds: 0
+      /* =========================================================
+   GET CURRENT SONG TITLE
+========================================================= */
 
-    });
+      function updateCurrentVideoTitle() {
+        if (!ytPlayer || !youtubeReady) {
+          return;
+        }
 
+        try {
+          const data = ytPlayer.getVideoData();
 
-    setMusicTitle(
-      "음악 준비 완료"
-    );
+          if (data && data.title) {
+            setMusicTitle(data.title);
+          }
+        } catch (e) {
+          console.warn("노래 제목을 가져올 수 없습니다:", e);
+        }
+      }
 
-
-    if (showMessage) {
-
-      showToast(
-        "YouTube 플레이리스트 저장 완료 🎵"
-      );
-
-    }
-
-  } catch (e) {
-
-    console.error(
-      "플레이리스트 로드 실패:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    PLAY MUSIC
 ========================================================= */
 
-function playMusic() {
+      function playMusic() {
+        if (!youtubeReady || !ytPlayer) {
+          setMusicTitle("음악 준비 중...");
 
-  if (!playlistId) {
+          return;
+        }
 
-    setMusicTitle(
-      "음악을 설정해주세요"
-    );
+        try {
+          ytPlayer.playVideo();
 
-    return;
-
-  }
-
-
-  if (
-    !youtubeReady ||
-    !ytPlayer
-  ) {
-
-    showToast(
-      "YouTube 플레이어 준비 중입니다 🎵"
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    ytPlayer.playVideo();
-
-
-    /*
-      playVideo() 직후에는
-      getVideoData()가 아직 이전 상태일 수 있어서
-      잠시 후 다시 가져옵니다.
+          /*
+      현재 노래 제목 업데이트
     */
 
-    setTimeout(
-      updateCurrentVideoTitle,
-      300
-    );
+          setTimeout(updateCurrentVideoTitle, 300);
 
+          setTimeout(updateCurrentVideoTitle, 1000);
+        } catch (e) {
+          console.warn("YouTube 재생 실패:", e);
+        }
+      }
 
-    setTimeout(
-      updateCurrentVideoTitle,
-      1000
-    );
-
-  } catch (e) {
-
-    console.warn(
-      "YouTube 재생 실패:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    PAUSE MUSIC
 ========================================================= */
 
-function pauseMusic() {
+      function pauseMusic() {
+        if (!youtubeReady || !ytPlayer) {
+          return;
+        }
 
-  if (
-    !youtubeReady ||
-    !ytPlayer
-  ) {
+        try {
+          ytPlayer.pauseVideo();
+        } catch (e) {
+          console.warn("YouTube 일시정지 실패:", e);
+        }
+      }
 
-    return;
-
-  }
-
-
-  try {
-
-    ytPlayer.pauseVideo();
-
-  } catch (e) {
-
-    console.warn(
-      "YouTube 일시정지 실패:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    RESET MUSIC
 ========================================================= */
 
-function resetMusic() {
+      function resetMusic() {
+        if (!youtubeReady || !ytPlayer) {
+          return;
+        }
 
-  if (
-    !youtubeReady ||
-    !ytPlayer
-  ) {
+        try {
+          ytPlayer.stopVideo();
 
-    return;
+          /*
+      플레이리스트 첫 번째 곡으로 이동
+    */
 
-  }
+          ytPlayer.cuePlaylist({
+            listType: "playlist",
 
+            list: PLAYLIST_ID,
 
-  try {
+            index: 0,
 
-    ytPlayer.stopVideo();
+            startSeconds: 0,
+          });
 
+          setMusicTitle("음악 대기 중");
+        } catch (e) {
+          console.warn("YouTube 초기화 실패:", e);
+        }
+      }
 
-    if (playlistId) {
-
-      ytPlayer.cuePlaylist({
-
-        listType: "playlist",
-
-        list: playlistId,
-
-        index: 0,
-
-        startSeconds: 0
-
-      });
-
-    }
-
-
-    setMusicTitle(
-      "음악 대기 중"
-    );
-
-  } catch (e) {
-
-    console.warn(
-      "YouTube 초기화 실패:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   BACKGROUND PICKER
+      /* =========================================================
+   BACKGROUND
 ========================================================= */
 
-function pickBackground() {
+      function pickBackground() {
+        if (backgrounds.length === 0) {
+          return;
+        }
 
-  if (
-    backgrounds.length === 0
-  ) {
+        let next;
 
-    return;
+        do {
+          next = Math.floor(Math.random() * backgrounds.length);
+        } while (backgrounds.length > 1 && next === currentBg);
 
-  }
+        currentBg = next;
 
+        bg.style.opacity = 0;
 
-  let next;
+        setTimeout(() => {
+          bg.src = backgrounds[currentBg];
 
+          bg.style.opacity = 1;
+        }, 180);
+      }
 
-  do {
+      pickBackground();
 
-    next =
-      Math.floor(
-        Math.random() *
-        backgrounds.length
-      );
-
-  } while (
-    backgrounds.length > 1 &&
-    next === currentBg
-  );
-
-
-  currentBg = next;
-
-
-  bg.style.opacity = 0;
-
-
-  setTimeout(() => {
-
-    bg.src =
-      backgrounds[currentBg];
-
-    bg.style.opacity = 1;
-
-  }, 180);
-
-}
-
-
-pickBackground();
-
-
-/* =========================================================
+      /* =========================================================
    TIME FORMAT
 ========================================================= */
 
-function format(sec) {
+      function format(sec) {
+        sec = Math.max(0, Math.ceil(sec));
 
-  sec =
-    Math.max(
-      0,
-      Math.ceil(sec)
-    );
+        return (
+          String(Math.floor(sec / 60)).padStart(2, "0") +
+          ":" +
+          String(sec % 60).padStart(2, "0")
+        );
+      }
 
-
-  return (
-
-    String(
-      Math.floor(sec / 60)
-    ).padStart(2, "0")
-
-    +
-
-    ":"
-
-    +
-
-    String(
-      sec % 60
-    ).padStart(2, "0")
-
-  );
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    RENDER
 ========================================================= */
 
-function render() {
+      function render() {
+        timeEl.textContent = format(remaining);
 
-  timeEl.textContent =
-    format(remaining);
+        modeEl.textContent = phase === "focus" ? "집중" : "휴식";
 
+        sessionEl.textContent = `ROUND ${round}`;
 
-  modeEl.textContent =
-    phase === "focus"
-      ? "집중"
-      : "휴식";
+        const ratio = Math.max(
+          0,
+          Math.min(1, (duration - remaining) / duration),
+        );
 
+        progress.style.strokeDasharray = `${C * ratio} ${C}`;
 
-  sessionEl.textContent =
-    `ROUND ${round}`;
+        progress.style.strokeDashoffset = 0;
 
+        document.title = `${format(remaining)} · ${
+          phase === "focus" ? "집중" : "휴식"
+        }`;
+      }
 
-  const ratio =
-    Math.max(
-      0,
-      Math.min(
-        1,
-        (duration - remaining) /
-        duration
-      )
-    );
-
-
-  progress.style.strokeDasharray =
-    `${C * ratio} ${C}`;
-
-
-  progress.style.strokeDashoffset =
-    0;
-
-
-  document.title =
-    `${format(remaining)} · ${
-      phase === "focus"
-        ? "집중"
-        : "휴식"
-    }`;
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    TOAST
 ========================================================= */
 
-function showToast(msg) {
+      function showToast(msg) {
+        toast.textContent = msg;
 
-  toast.textContent =
-    msg;
+        toast.classList.add("show");
 
+        clearTimeout(showToast.t);
 
-  toast.classList.add(
-    "show"
-  );
+        showToast.t = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2200);
+      }
 
-
-  clearTimeout(
-    showToast.t
-  );
-
-
-  showToast.t =
-    setTimeout(() => {
-
-      toast.classList.remove(
-        "show"
-      );
-
-    }, 2200);
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    SOUNDS
 ========================================================= */
 
-const sounds = {
+      const sounds = {
+        focusStart: new Audio("sounds/focus-start.wav"),
 
-  focusStart:
-    new Audio(
-      "sounds/focus-start.wav"
-    ),
+        focusEnd: new Audio("sounds/focus-end.wav"),
 
-  focusEnd:
-    new Audio(
-      "sounds/focus-end.wav"
-    ),
+        breakStart: new Audio("sounds/break-start.wav"),
 
-  breakStart:
-    new Audio(
-      "sounds/break-start.wav"
-    ),
+        breakEnd: new Audio("sounds/break-end.wav"),
 
-  breakEnd:
-    new Audio(
-      "sounds/break-end.wav"
-    ),
+        pause: new Audio("sounds/pause.wav"),
+      };
 
-  pause:
-    new Audio(
-      "sounds/pause.wav"
-    )
+      Object.values(sounds).forEach((audio) => {
+        audio.preload = "auto";
 
-};
+        audio.volume = 1.0;
+      });
 
-
-Object.values(sounds)
-  .forEach(audio => {
-
-    audio.preload =
-      "auto";
-
-    audio.volume =
-      1.0;
-
-  });
-
-
-/* =========================================================
+      /* =========================================================
    PLAY SOUND
 ========================================================= */
 
-function beep(kind) {
+      function beep(kind) {
+        try {
+          const audio = sounds[kind] || sounds.focusStart;
 
-  try {
+          audio.currentTime = 0;
 
-    const audio =
-      sounds[kind] ||
-      sounds.focusStart;
+          const p = audio.play();
 
+          if (p) {
+            p.catch((e) => {
+              console.warn("알림음 재생 실패:", e);
+            });
+          }
+        } catch (e) {
+          console.warn("알림음 재생 실패:", e);
+        }
+      }
 
-    audio.currentTime =
-      0;
-
-
-    const p =
-      audio.play();
-
-
-    if (p) {
-
-      p.catch(e => {
-
-        console.warn(
-          "알림음 재생 실패:",
-          e
-        );
-
-      });
-
-    }
-
-  } catch (e) {
-
-    console.warn(
-      "알림음 재생 실패:",
-      e
-    );
-
-  }
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    START
 ========================================================= */
 
-function start() {
+      function start() {
+        if (running) {
+          return;
+        }
 
-  if (running) {
-
-    return;
-
-  }
-
-
-  /*
+        /*
     브라우저 오디오 권한 활성화
   */
 
-  try {
+        try {
+          audioCtx =
+            audioCtx ||
+            new (window.AudioContext || window.webkitAudioContext)();
 
-    audioCtx =
-      audioCtx ||
-      new (
-        window.AudioContext ||
-        window.webkitAudioContext
-      )();
+          if (audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+        } catch (e) {}
 
+        running = true;
 
-    if (
-      audioCtx.state ===
-      "suspended"
-    ) {
+        lastTick = performance.now();
 
-      audioCtx.resume();
+        beep(phase === "focus" ? "focusStart" : "breakStart");
 
-    }
+        /* =====================================================
+     집중
+  ==================================================== */
 
-  } catch (e) {}
+        if (phase === "focus") {
+          playMusic();
 
+          showToast("집중 시작 🍅 🎵");
+        } else {
 
-  running = true;
+        /* =====================================================
+     휴식
+  ==================================================== */
+          pauseMusic();
 
+          setMusicTitle("휴식 중 ☕");
 
-  lastTick =
-    performance.now();
+          showToast("휴식 시작 ☕");
+        }
 
+        timerId = requestAnimationFrame(tick);
+      }
 
-  beep(
-    phase === "focus"
-      ? "focusStart"
-      : "breakStart"
-  );
-
-
-  /*
-    집중 시간에는 음악 재생
-  */
-
-  if (
-    phase === "focus"
-  ) {
-
-    playMusic();
-
-
-    showToast(
-      "집중 시작 🍅 🎵"
-    );
-
-  }
-
-
-  /*
-    휴식 시간에는 음악 정지
-  */
-
-  else {
-
-    pauseMusic();
-
-
-    showToast(
-      "휴식 시작 ☕"
-    );
-
-  }
-
-
-  timerId =
-    requestAnimationFrame(
-      tick
-    );
-
-}
-
-
-/* =========================================================
-   TICK
+      /* =========================================================
+   TIMER TICK
 ========================================================= */
 
-function tick(now) {
+      function tick(now) {
+        if (!running) {
+          return;
+        }
 
-  if (!running) {
+        const delta = (now - lastTick) / 1000;
 
-    return;
+        lastTick = now;
 
-  }
+        remaining -= delta;
 
+        if (remaining <= 0) {
+          remaining = 0;
 
-  const delta =
-    (now - lastTick) /
-    1000;
+          render();
 
+          transition();
 
-  lastTick =
-    now;
+          return;
+        }
 
+        render();
 
-  remaining -=
-    delta;
+        timerId = requestAnimationFrame(tick);
+      }
 
-
-  if (
-    remaining <= 0
-  ) {
-
-    remaining = 0;
-
-
-    render();
-
-
-    transition();
-
-
-    return;
-
-  }
-
-
-  render();
-
-
-  timerId =
-    requestAnimationFrame(
-      tick
-    );
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    PAUSE
 ========================================================= */
 
-function pause() {
+      function pause() {
+        if (!running) {
+          return;
+        }
 
-  if (!running) {
+        running = false;
 
-    return;
+        cancelAnimationFrame(timerId);
 
-  }
-
-
-  running = false;
-
-
-  cancelAnimationFrame(
-    timerId
-  );
-
-
-  /*
-    타이머와 음악을
-    동시에 일시정지
+        /*
+    음악도 같이 일시정지
   */
 
-  pauseMusic();
+        pauseMusic();
 
+        beep("pause");
 
-  beep("pause");
+        showToast("일시정지");
+      }
 
-
-  showToast(
-    "일시정지"
-  );
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    TRANSITION
 ========================================================= */
 
-function transition() {
+      function transition() {
+        running = false;
 
-  running = false;
+        cancelAnimationFrame(timerId);
 
-
-  cancelAnimationFrame(
-    timerId
-  );
-
-
-  /* =====================================================
+        /* =====================================================
      집중 → 휴식
-  ===================================================== */
+  ==================================================== */
 
-  if (
-    phase === "focus"
-  ) {
+        if (phase === "focus") {
+          beep("focusEnd");
 
-    beep(
-      "focusEnd"
-    );
-
-
-    /*
-      ★ 음악 정지
+          /*
+      ★ 집중 종료
+      음악 정지
     */
 
-    pauseMusic();
+          pauseMusic();
 
+          phase = "break";
 
-    phase =
-      "break";
+          duration = 5 * 60;
 
+          remaining = duration;
 
-    duration =
-      5 * 60;
+          setMusicTitle("휴식 중 ☕");
 
+          showToast("집중 끝! 5분 휴식 🌿");
+        } else {
 
-    remaining =
-      duration;
-
-
-    setMusicTitle(
-      "휴식 중 ☕"
-    );
-
-
-    showToast(
-      "집중 끝! 5분 휴식 🌿"
-    );
-
-  }
-
-
-  /* =====================================================
+        /* =====================================================
      휴식 → 집중
-  ===================================================== */
+  ==================================================== */
+          beep("breakEnd");
 
-  else {
+          phase = "focus";
 
-    beep(
-      "breakEnd"
-    );
+          duration = 25 * 60;
 
+          remaining = duration;
 
-    phase =
-      "focus";
+          round++;
 
+          pickBackground();
 
-    duration =
-      25 * 60;
-
-
-    remaining =
-      duration;
-
-
-    round++;
-
-
-    pickBackground();
-
-
-    /*
-      ★ 음악 다시 재생
+          /*
+      ★ 다시 집중
+      음악 재생
     */
 
-    playMusic();
+          playMusic();
 
+          showToast("휴식 끝! 다시 집중 🍅 🎵");
+        }
 
-    showToast(
-      "휴식 끝! 다시 집중 🍅 🎵"
-    );
+        render();
 
-  }
-
-
-  render();
-
-
-  /*
+        /*
     다음 단계 자동 시작
   */
 
-  start();
+        start();
+      }
 
-}
-
-
-/* =========================================================
+      /* =========================================================
    SKIP
 ========================================================= */
 
-function skip() {
+      function skip() {
+        transition();
+      }
 
-  transition();
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    RESET
 ========================================================= */
 
-function reset() {
+      function reset() {
+        running = false;
 
-  running = false;
+        cancelAnimationFrame(timerId);
 
+        phase = "focus";
 
-  cancelAnimationFrame(
-    timerId
-  );
+        duration = 25 * 60;
 
+        remaining = duration;
 
-  phase =
-    "focus";
+        round = 1;
 
+        resetMusic();
 
-  duration =
-    25 * 60;
+        pickBackground();
 
+        render();
 
-  remaining =
-    duration;
+        showToast("처음부터 시작");
+      }
 
-
-  round = 1;
-
-
-  resetMusic();
-
-
-  pickBackground();
-
-
-  render();
-
-
-  showToast(
-    "처음부터 시작"
-  );
-
-}
-
-
-/* =========================================================
-   MUSIC MODAL
-========================================================= */
-
-const musicModal =
-  document.getElementById(
-    "musicModal"
-  );
-
-
-const playlistInput =
-  document.getElementById(
-    "playlistInput"
-  );
-
-
-const musicInfoModal =
-  document.getElementById(
-    "musicInfoModal"
-  );
-
-
-/* =========================================================
-   OPEN MUSIC SETTINGS
-========================================================= */
-
-function openMusicSettings() {
-
-  playlistInput.value =
-    playlistId
-      ? `https://www.youtube.com/playlist?list=${playlistId}`
-      : "";
-
-
-  if (playlistId) {
-
-    musicInfoModal.textContent =
-      `현재 설정된 플레이리스트: ${playlistId}`;
-
-  } else {
-
-    musicInfoModal.textContent =
-      "아직 플레이리스트가 설정되지 않았습니다.";
-
-  }
-
-
-  musicModal.classList.add(
-    "show"
-  );
-
-
-  setTimeout(() => {
-
-    playlistInput.focus();
-
-  }, 50);
-
-}
-
-
-/* =========================================================
-   CLOSE MUSIC SETTINGS
-========================================================= */
-
-function closeMusicSettings() {
-
-  musicModal.classList.remove(
-    "show"
-  );
-
-}
-
-
-/* =========================================================
-   SAVE MUSIC
-========================================================= */
-
-function saveMusic() {
-
-  const value =
-    playlistInput.value.trim();
-
-
-  /*
-    입력창을 비우면
-    음악 설정 삭제
-  */
-
-  if (!value) {
-
-    playlistId = "";
-
-
-    localStorage.removeItem(
-      "cozyPomodoroPlaylist"
-    );
-
-
-    resetMusic();
-
-
-    setMusicTitle(
-      ""
-    );
-
-
-    closeMusicSettings();
-
-
-    showToast(
-      "음악 설정을 삭제했습니다"
-    );
-
-
-    return;
-
-  }
-
-
-  const id =
-    extractPlaylistId(
-      value
-    );
-
-
-  if (!id) {
-
-    showToast(
-      "올바른 YouTube 플레이리스트 주소를 입력하세요"
-    );
-
-
-    return;
-
-  }
-
-
-  playlistId =
-    id;
-
-
-  localStorage.setItem(
-    "cozyPomodoroPlaylist",
-    playlistId
-  );
-
-
-  if (youtubeReady) {
-
-    loadPlaylist(
-      playlistId,
-      false
-    );
-
-  }
-
-
-  musicInfoModal.textContent =
-    `플레이리스트 ID: ${playlistId}`;
-
-
-  closeMusicSettings();
-
-
-  showToast(
-    "플레이리스트 저장 완료 🎵"
-  );
-
-}
-
-
-/* =========================================================
+      /* =========================================================
    BUTTON EVENTS
 ========================================================= */
 
-document
-  .getElementById("start")
-  .onclick =
-  start;
+      document.getElementById("start").onclick = start;
 
+      document.getElementById("pause").onclick = pause;
 
-document
-  .getElementById("pause")
-  .onclick =
-  pause;
+      document.getElementById("skip").onclick = skip;
 
+      document.getElementById("reset").onclick = reset;
 
-document
-  .getElementById("skip")
-  .onclick =
-  skip;
-
-
-document
-  .getElementById("reset")
-  .onclick =
-  reset;
-
-
-document
-  .getElementById("musicSetting")
-  .onclick =
-  openMusicSettings;
-
-
-document
-  .getElementById("cancelMusic")
-  .onclick =
-  closeMusicSettings;
-
-
-document
-  .getElementById("saveMusic")
-  .onclick =
-  saveMusic;
-
-
-/* =========================================================
-   ENTER / ESC
-========================================================= */
-
-playlistInput.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-      event.key === "Enter"
-    ) {
-
-      saveMusic();
-
-    }
-
-
-    if (
-      event.key === "Escape"
-    ) {
-
-      closeMusicSettings();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CLICK OUTSIDE MODAL
-========================================================= */
-
-musicModal.addEventListener(
-  "click",
-  function(event) {
-
-    if (
-      event.target ===
-      musicModal
-    ) {
-
-      closeMusicSettings();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
+      /* =========================================================
    INITIAL RENDER
 ========================================================= */
 
-render();
-
-
-if (playlistId) {
-
-  setMusicTitle(
-    "음악 준비 중..."
-  );
-
-} else {
-
-  setMusicTitle(
-    ""
-  );
-
-}
-
-</script>
-
-</body>
-
+      render();
+    </script>
+  </body>
 </html>
