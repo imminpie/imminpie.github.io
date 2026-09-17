@@ -583,6 +583,7 @@
 
       // 백그라운드 탭에서도 가능한 범위에서 타이머 상태를 확인합니다.
       let backgroundTimerId = null;
+      let titleTimerId = null;
 
       /* =========================================================
    AUDIO
@@ -761,6 +762,8 @@
         // 주기적으로 실제 종료 시각을 확인합니다.
         clearInterval(backgroundTimerId);
         backgroundTimerId = setInterval(checkTimer, 250);
+
+        startTitleTimer();
       }
 
       /* =========================================================
@@ -823,6 +826,8 @@
         cancelAnimationFrame(timerId);
         clearInterval(backgroundTimerId);
         backgroundTimerId = null;
+        clearTimeout(titleTimerId);
+        titleTimerId = null;
         endTime = null;
 
         beep("pause");
@@ -842,6 +847,8 @@
         cancelAnimationFrame(timerId);
         clearInterval(backgroundTimerId);
         backgroundTimerId = null;
+        clearTimeout(titleTimerId);
+        titleTimerId = null;
         endTime = null;
 
         if (phase === "focus") {
@@ -906,6 +913,8 @@
         cancelAnimationFrame(timerId);
         clearInterval(backgroundTimerId);
         backgroundTimerId = null;
+        clearTimeout(titleTimerId);
+        titleTimerId = null;
         endTime = null;
 
         phase = "focus";
@@ -924,17 +933,46 @@
       }
 
       /* =========================================================
+   TAB TITLE TIMER
+========================================================= */
+
+      function updateTabTitle() {
+        if (!running || endTime === null) {
+          return;
+        }
+
+        const currentRemaining = Math.max(0, (endTime - Date.now()) / 1000);
+
+        document.title = `${format(currentRemaining)} · ${phase === "focus" ? "집중" : "휴식"}`;
+
+        if (currentRemaining <= 0) {
+          checkTimer();
+          return;
+        }
+
+        const delay = document.visibilityState === "visible" ? 250 : 1000;
+        titleTimerId = setTimeout(updateTabTitle, delay);
+      }
+
+      function startTitleTimer() {
+        clearTimeout(titleTimerId);
+        titleTimerId = null;
+        updateTabTitle();
+      }
+
+      /* =========================================================
    VISIBILITY / BACKGROUND RECOVERY
 ========================================================= */
 
       // 다른 탭을 사용하다 돌아왔을 때 즉시 실제 경과 시간을 반영합니다.
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && running) {
+        if (running) {
           checkTimer();
 
           if (running) {
             remaining = Math.max(0, (endTime - Date.now()) / 1000);
             render();
+            startTitleTimer();
           }
         }
       });
