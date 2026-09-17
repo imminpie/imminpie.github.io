@@ -1,25 +1,16 @@
 <!doctype html>
-
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
-
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <title>Cozy Pomodoro</title>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
-
     <style>
-      /* =========================================================
-   BASIC
-========================================================= */
-
       :root {
         --white: rgba(255, 255, 255, 0.94);
       }
@@ -33,255 +24,140 @@
         width: 100%;
         height: 100%;
         margin: 0;
+        overflow: hidden;
+        font-family: Arial, "Noto Sans KR", sans-serif;
       }
 
       body {
-        overflow: hidden;
-
-        font-family: Arial, "Noto Sans KR", sans-serif;
-
-        color: white;
-
         background: #222;
+        color: white;
       }
 
-      /* =========================================================
+      /* =========================
    BACKGROUND
-========================================================= */
+========================= */
 
       #bg {
         position: fixed;
-
         inset: 0;
-
         width: 100%;
         height: 100%;
-
         object-fit: cover;
-
         z-index: -3;
-
-        opacity: 1;
-
-        transition: opacity 0.6s ease;
+        transition: opacity 0.6s;
       }
 
       #shade {
         position: fixed;
-
         inset: 0;
-
         background: rgba(0, 0, 0, 0.16);
-
         z-index: -2;
       }
 
-      /* =========================================================
-   MAIN LAYOUT
-========================================================= */
+      /* =========================
+   MAIN
+========================= */
 
       .wrap {
-        position: relative;
-
         width: 100%;
         height: 100%;
-
-        min-height: 100dvh;
-
         display: flex;
-
         align-items: center;
         justify-content: center;
-
-        padding: max(20px, env(safe-area-inset-top))
-          max(20px, env(safe-area-inset-right))
-          max(20px, env(safe-area-inset-bottom))
-          max(20px, env(safe-area-inset-left));
+        padding: 24px;
       }
 
       .timerBox {
-        width: min(92vw, 620px);
+        width: 100%;
+        text-align: center;
 
         display: flex;
-
         flex-direction: column;
-
         align-items: center;
-
-        justify-content: center;
-
-        text-align: center;
       }
 
-      /* =========================================================
+      /* =========================
    TIMER RING
-========================================================= */
+========================= */
 
       .ring {
+        width: min(52vh, 430px);
+        height: min(52vh, 430px);
+
         position: relative;
 
-        width: min(62vw, 62vh, 430px);
-
-        aspect-ratio: 1 / 1;
-
-        flex: 0 0 auto;
-
         display: grid;
-
         place-items: center;
       }
 
-      .ring svg {
+      svg {
         position: absolute;
-
         inset: 0;
 
         width: 100%;
         height: 100%;
 
         transform: rotate(-90deg);
-
-        overflow: visible;
       }
 
       .track {
         fill: none;
-
         stroke: rgba(255, 255, 255, 0.32);
-
         stroke-width: 5;
       }
 
       .progress {
         fill: none;
-
         stroke: white;
-
         stroke-width: 5;
-
         stroke-linecap: round;
 
         transition: stroke-dasharray 0.25s linear;
       }
 
-      /* =========================================================
-   TIMER CONTENT
-========================================================= */
-
-      .timerContent {
-        position: relative;
-
-        z-index: 1;
-
-        width: 82%;
-
-        display: flex;
-
-        flex-direction: column;
-
-        align-items: center;
-
-        justify-content: center;
-
-        overflow: hidden;
-      }
+      /* =========================
+   TIME
+========================= */
 
       .time {
-        max-width: 100%;
-
-        font-size: min(15vw, 15vh, 104px);
-
-        line-height: 0.95;
-
+        font-size: clamp(58px, 9vw, 104px);
         font-weight: 700;
-
-        letter-spacing: 1px;
-
-        white-space: nowrap;
+        letter-spacing: 2px;
 
         text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+
+        white-space: nowrap;
       }
 
       .mode {
-        margin-top: clamp(7px, 1vh, 12px);
+        margin-top: 10px;
 
-        font-size: min(2vw, 2vh, 15px);
-
-        line-height: 1;
-
-        letter-spacing: clamp(2px, 0.5vw, 4px);
-
+        font-size: 15px;
+        letter-spacing: 4px;
         font-weight: 700;
 
-        white-space: nowrap;
-
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
       }
 
-      /* =========================================================
-   MUSIC TITLE
-========================================================= */
-
-      .musicInfo {
-        width: min(76vw, 360px);
-
-        margin-top: clamp(10px, 2vh, 16px);
-
-        min-height: 20px;
-
-        display: flex;
-
-        align-items: center;
-
-        justify-content: center;
-
-        gap: 6px;
-
-        overflow: hidden;
-
-        color: rgba(255, 255, 255, 0.88);
-
-        font-size: clamp(10px, 1.5vw, 13px);
-
-        line-height: 1.4;
-
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-      }
-
-      .musicIcon {
-        flex: 0 0 auto;
-
-        font-size: clamp(10px, 1.4vw, 12px);
-      }
-
-      #musicTitle {
-        min-width: 0;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
-
-        white-space: nowrap;
-      }
-
-      /* =========================================================
-   CONTROLS
-========================================================= */
+      /* =========================
+   BUTTONS
+========================= */
 
       .controls {
         width: 100%;
 
-        margin-top: clamp(12px, 2.2vh, 24px);
+        margin-top: 24px;
 
         display: flex;
-
+        flex-direction: row;
         flex-wrap: wrap;
 
-        justify-content: center;
+        gap: 9px;
 
+        justify-content: center;
         align-items: center;
 
-        gap: clamp(5px, 1vw, 9px);
+        max-width: 100%;
       }
 
       button {
@@ -290,18 +166,15 @@
         background: rgba(255, 255, 255, 0.18);
 
         backdrop-filter: blur(8px);
-
         -webkit-backdrop-filter: blur(8px);
 
         color: white;
 
         border-radius: 999px;
 
-        padding: clamp(7px, 1.2vw, 10px) clamp(12px, 1.8vw, 17px);
+        padding: 10px 17px;
 
-        font-size: clamp(11px, 1.5vw, 14px);
-
-        line-height: 1.2;
+        font-size: 14px;
 
         cursor: pointer;
 
@@ -310,8 +183,8 @@
         -webkit-tap-highlight-color: transparent;
 
         transition:
-          background 0.15s ease,
-          transform 0.1s ease;
+          background 0.15s,
+          transform 0.1s;
       }
 
       button:hover {
@@ -320,20 +193,18 @@
 
       button:active {
         background: rgba(255, 255, 255, 0.36);
-
         transform: scale(0.97);
       }
 
-      /* =========================================================
+      /* =========================
    ROUND BADGE
-========================================================= */
+========================= */
 
       .badge {
         position: fixed;
 
-        top: max(18px, env(safe-area-inset-top));
-
-        left: max(18px, env(safe-area-inset-left));
+        top: 18px;
+        left: 18px;
 
         padding: 7px 11px;
 
@@ -342,99 +213,26 @@
         background: rgba(0, 0, 0, 0.25);
 
         backdrop-filter: blur(8px);
-
         -webkit-backdrop-filter: blur(8px);
 
         font-size: 12px;
-
-        z-index: 5;
       }
 
-      /* =========================================================
-   FULLSCREEN BUTTON
-========================================================= */
-
-      .fullscreenBtn {
-        position: fixed;
-
-        top: max(18px, env(safe-area-inset-top));
-
-        right: max(18px, env(safe-area-inset-right));
-
-        width: 40px;
-        height: 40px;
-
-        display: grid;
-
-        place-items: center;
-
-        padding: 0;
-
-        border: 1px solid rgba(255, 255, 255, 0.45);
-
-        border-radius: 50%;
-
-        background: rgba(0, 0, 0, 0.25);
-
-        backdrop-filter: blur(8px);
-
-        -webkit-backdrop-filter: blur(8px);
-
-        color: white;
-
-        font-size: 21px;
-
-        line-height: 1;
-
-        z-index: 20;
-      }
-
-      .fullscreenBtn:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
-
-      .fullscreenBtn:active {
-        transform: scale(0.92);
-      }
-
-      /* =========================================================
-   YOUTUBE PLAYER
-========================================================= */
-
-      #youtubePlayer {
-        position: fixed;
-
-        width: 1px;
-        height: 1px;
-
-        left: -10px;
-        bottom: -10px;
-
-        opacity: 0;
-
-        pointer-events: none;
-      }
-
-      /* =========================================================
+      /* =========================
    TOAST
-========================================================= */
+========================= */
 
       #toast {
         position: fixed;
 
-        top: max(18px, env(safe-area-inset-top));
-
+        top: 18px;
         left: 50%;
-
-        max-width: calc(100vw - 40px);
 
         transform: translateX(-50%) translateY(-20px);
 
         opacity: 0;
 
-        transition:
-          opacity 0.35s ease,
-          transform 0.35s ease;
+        transition: 0.35s;
 
         padding: 10px 16px;
 
@@ -443,7 +241,6 @@
         background: rgba(0, 0, 0, 0.55);
 
         backdrop-filter: blur(10px);
-
         -webkit-backdrop-filter: blur(10px);
 
         font-size: 13px;
@@ -451,10 +248,6 @@
         pointer-events: none;
 
         white-space: nowrap;
-
-        overflow: hidden;
-
-        text-overflow: ellipsis;
 
         z-index: 10;
       }
@@ -466,88 +259,80 @@
       }
 
       /* =========================================================
-   TABLET / SMALL LAPTOP
+   MOBILE
 ========================================================= */
 
-      @media (max-width: 900px) {
-        .timerBox {
-          width: min(94vw, 600px);
-        }
-
-        .ring {
-          width: min(64vw, 64vh, 380px);
-        }
-
-        .time {
-          font-size: min(15vw, 15vh, 90px);
-        }
-      }
-
-      /* =========================================================
-   MOBILE PORTRAIT
-========================================================= */
-
-      @media (max-width: 600px) and (orientation: portrait) {
+      @media (max-width: 600px) {
         .wrap {
-          padding: max(14px, env(safe-area-inset-top))
-            max(14px, env(safe-area-inset-right))
-            max(14px, env(safe-area-inset-bottom))
-            max(14px, env(safe-area-inset-left));
+          padding: max(16px, env(safe-area-inset-top))
+            max(16px, env(safe-area-inset-right))
+            max(16px, env(safe-area-inset-bottom))
+            max(16px, env(safe-area-inset-left));
         }
 
         .timerBox {
-          width: 94vw;
+          width: 100%;
         }
+
+        /* 원형 타이머 크기 */
 
         .ring {
-          width: min(72vw, 55vh, 330px);
+          width: min(66vw, 290px);
+          height: min(66vw, 290px);
         }
 
-        .timerContent {
-          width: 80%;
-        }
+        /* 시간 */
 
         .time {
-          font-size: min(15vw, 12.5vh, 76px);
-
-          letter-spacing: 0.5px;
+          font-size: clamp(48px, 14vw, 72px);
+          letter-spacing: 1px;
         }
 
         .mode {
-          margin-top: 7px;
+          margin-top: 5px;
 
-          font-size: min(3vw, 2vh, 13px);
-
+          font-size: 12px;
           letter-spacing: 3px;
         }
 
-        .musicInfo {
-          width: min(78vw, 300px);
-
-          margin-top: 9px;
-
-          font-size: 11px;
-        }
+        /* 버튼
+     기본은 가로 배치.
+     화면이 부족하면 자동 줄바꿈.
+  */
 
         .controls {
-          width: 96%;
+          width: 100%;
 
           margin-top: 10px;
+          padding: 0;
+
+          display: flex;
+
+          flex-direction: row;
+          flex-wrap: wrap;
+
+          justify-content: center;
+          align-items: center;
 
           gap: 6px;
         }
 
         button {
-          padding: 7px 13px;
+          width: auto;
+
+          min-height: 34px;
+
+          padding: 7px 14px;
 
           font-size: 12px;
 
-          min-height: 34px;
+          line-height: 1.2;
         }
+
+        /* ROUND 표시 */
 
         .badge {
           top: max(10px, env(safe-area-inset-top));
-
           left: max(10px, env(safe-area-inset-left));
 
           padding: 6px 9px;
@@ -555,73 +340,63 @@
           font-size: 11px;
         }
 
-        .fullscreenBtn {
-          top: max(10px, env(safe-area-inset-top));
-
-          right: max(10px, env(safe-area-inset-right));
-
-          width: 36px;
-          height: 36px;
-
-          font-size: 19px;
-        }
+        /* Toast */
 
         #toast {
           top: max(10px, env(safe-area-inset-top));
 
-          max-width: calc(100vw - 28px);
+          max-width: calc(100vw - 32px);
 
           padding: 8px 13px;
 
           font-size: 12px;
+
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
 
       /* =========================================================
-   VERY SMALL MOBILE
+   VERY SMALL PHONE
 ========================================================= */
 
-      @media (max-width: 380px) and (orientation: portrait) {
+      @media (max-width: 380px) {
         .wrap {
-          padding: 10px;
+          padding: 12px;
         }
+
+        /* 원형을 조금 더 작게 */
 
         .ring {
-          width: min(70vw, 50vh, 270px);
-        }
-
-        .timerContent {
-          width: 78%;
+          width: min(60vw, 250px);
+          height: min(60vw, 250px);
         }
 
         .time {
-          font-size: min(14vw, 11vh, 62px);
+          font-size: clamp(42px, 13vw, 60px);
         }
 
         .mode {
-          margin-top: 5px;
+          margin-top: 4px;
 
-          font-size: 10px;
-
+          font-size: 11px;
           letter-spacing: 2.5px;
         }
 
-        .musicInfo {
-          margin-top: 7px;
-
-          font-size: 10px;
-        }
+        /* 버튼은 여전히 가로 우선,
+     공간이 없으면 자동으로 다음 줄 */
 
         .controls {
           margin-top: 7px;
-
           gap: 5px;
         }
 
         button {
-          min-height: 31px;
+          width: auto;
 
-          padding: 6px 11px;
+          min-height: 32px;
+
+          padding: 6px 12px;
 
           font-size: 11px;
         }
@@ -637,170 +412,87 @@
         }
 
         .timerBox {
-          width: 94vw;
+          transform: scale(0.72);
         }
+
+        /* 가로 화면에서는 높이 기준으로 원 크기 결정 */
 
         .ring {
-          width: min(42vh, 42vw, 300px);
+          width: min(58vh, 280px);
+          height: min(58vh, 280px);
         }
 
-        .timerContent {
-          width: 80%;
-        }
-
-        .time {
-          font-size: min(11vh, 11vw, 70px);
-        }
-
-        .mode {
-          margin-top: 5px;
-
-          font-size: min(2.4vh, 2.4vw, 12px);
-
-          letter-spacing: 2.5px;
-        }
-
-        .musicInfo {
-          margin-top: 6px;
-
-          font-size: min(2.2vh, 2.2vw, 11px);
-        }
+        /* 버튼도 가로 우선 */
 
         .controls {
           margin-top: 8px;
+
+          display: flex;
+
+          flex-direction: row;
+          flex-wrap: wrap;
+
+          justify-content: center;
+          align-items: center;
 
           gap: 5px;
         }
 
         button {
+          width: auto;
+
           min-height: 30px;
 
           padding: 6px 12px;
 
-          font-size: min(2.2vh, 2.2vw, 11px);
+          font-size: 11px;
         }
 
         .badge {
           top: 8px;
           left: 8px;
-
-          padding: 5px 8px;
-
-          font-size: 10px;
-        }
-
-        .fullscreenBtn {
-          top: 8px;
-          right: 8px;
-
-          width: 34px;
-          height: 34px;
-
-          font-size: 18px;
         }
 
         #toast {
           top: 8px;
-
-          padding: 7px 12px;
-
-          font-size: 11px;
-        }
-      }
-
-      /* =========================================================
-   EXTREMELY SHORT SCREEN
-========================================================= */
-
-      @media (max-height: 500px) {
-        .ring {
-          width: min(43vh, 60vw, 280px);
-        }
-
-        .time {
-          font-size: min(11vh, 14vw, 68px);
-        }
-
-        .musicInfo {
-          margin-top: 5px;
-        }
-
-        .controls {
-          margin-top: 6px;
-        }
-      }
-
-      /* =========================================================
-   LARGE SCREEN
-========================================================= */
-
-      @media (min-width: 1400px) and (min-height: 800px) {
-        .ring {
-          width: min(52vh, 430px);
-        }
-
-        .time {
-          font-size: min(12vh, 104px);
         }
       }
     </style>
   </head>
 
   <body>
-    <!-- =======================================================
+    <!-- =========================
      BACKGROUND
-======================================================== -->
+========================= -->
 
     <img id="bg" alt="" />
 
     <div id="shade"></div>
 
-    <!-- =======================================================
+    <!-- =========================
      ROUND
-======================================================== -->
+========================= -->
 
     <div class="badge" id="session">ROUND 1</div>
 
-    <!-- =======================================================
-     FULLSCREEN
-======================================================== -->
-
-    <button
-      class="fullscreenBtn"
-      id="fullscreenBtn"
-      aria-label="전체 화면"
-      title="전체 화면"
-    >
-      ⛶
-    </button>
-
-    <!-- =======================================================
+    <!-- =========================
      TOAST
-======================================================== -->
+========================= -->
 
     <div id="toast"></div>
 
-    <!-- =======================================================
-     YOUTUBE PLAYER
-======================================================== -->
-
-    <div id="youtubePlayer"></div>
-
-    <!-- =======================================================
-     MAIN
-======================================================== -->
+    <!-- =========================
+     TIMER
+========================= -->
 
     <div class="wrap">
-      <main class="timerBox">
-        ```
-        <!-- =================================================
-     TIMER
-================================================== -->
-
+      <div class="timerBox">
         <div class="ring">
           <svg viewBox="0 0 200 200" aria-hidden="true">
+            <!-- 전체 원 -->
             <circle class="track" cx="100" cy="100" r="92"></circle>
 
+            <!-- 진행 원 -->
             <circle
               class="progress"
               id="progress"
@@ -810,26 +502,16 @@
             ></circle>
           </svg>
 
-          <div class="timerContent">
+          <div>
             <div class="time" id="time">25:00</div>
 
             <div class="mode" id="mode">집중</div>
           </div>
         </div>
 
-        <!-- =================================================
-     MUSIC TITLE
-================================================== -->
-
-        <div class="musicInfo" id="musicInfo">
-          <span class="musicIcon"> ♫ </span>
-
-          <span id="musicTitle"> 음악 준비 중... </span>
-        </div>
-
-        <!-- =================================================
-     CONTROLS
-================================================== -->
+        <!-- =========================
+         CONTROLS
+    ========================= -->
 
         <div class="controls">
           <button id="start">▶ 시작</button>
@@ -840,53 +522,33 @@
 
           <button id="reset">↻ 처음부터</button>
         </div>
-        ```
-      </main>
+      </div>
     </div>
 
     <script>
-      /* =========================================================
-   FIXED YOUTUBE PLAYLIST
-========================================================= */
-
-      const PLAYLIST_ID = "PLYPZ0oNM1h6E";
-
       /* =========================================================
    BACKGROUNDS
 ========================================================= */
 
       const BUILTIN = [
         "backgrounds/bg1.jpg",
-
         "backgrounds/bg2.jpg",
-
         "backgrounds/bg3.jpg",
       ];
 
       let backgrounds = [...BUILTIN];
-
       let currentBg = -1;
-
-      /* =========================================================
-   ELEMENTS
-========================================================= */
 
       const bg = document.getElementById("bg");
 
       const timeEl = document.getElementById("time");
-
       const modeEl = document.getElementById("mode");
-
       const progress = document.getElementById("progress");
-
       const sessionEl = document.getElementById("session");
-
       const toast = document.getElementById("toast");
 
-      const musicTitleEl = document.getElementById("musicTitle");
-
       /* =========================================================
-   TIMER CIRCLE
+   CIRCLE
 ========================================================= */
 
       const R = 92;
@@ -894,7 +556,6 @@
       const C = 2 * Math.PI * R;
 
       progress.style.strokeDasharray = `0 ${C}`;
-
       progress.style.strokeDashoffset = 0;
 
       /* =========================================================
@@ -909,217 +570,25 @@
 
       let running = false;
 
+      // 실제 종료 시각을 기준으로 시간을 계산합니다.
+      // requestAnimationFrame이 백그라운드 탭에서 제한되어도
+      // 탭을 다시 열었을 때 실제 경과 시간이 정확히 반영됩니다.
+      let endTime = null;
+
       let lastTick = null;
 
       let round = 1;
 
       let timerId = null;
 
+      // 백그라운드 탭에서도 가능한 범위에서 타이머 상태를 확인합니다.
+      let backgroundTimerId = null;
+
       /* =========================================================
    AUDIO
 ========================================================= */
 
       let audioCtx = null;
-
-      /* =========================================================
-   YOUTUBE
-========================================================= */
-
-      let ytPlayer = null;
-
-      let youtubeReady = false;
-
-      /* =========================================================
-   MUSIC TITLE
-========================================================= */
-
-      function setMusicTitle(title) {
-        if (!title) {
-          musicTitleEl.textContent = "음악 준비 중...";
-
-          return;
-        }
-
-        musicTitleEl.textContent = title;
-      }
-
-      /* =========================================================
-   YOUTUBE API READY
-========================================================= */
-
-      function onYouTubeIframeAPIReady() {
-        ytPlayer = new YT.Player("youtubePlayer", {
-          width: "1",
-
-          height: "1",
-
-          playerVars: {
-            autoplay: 0,
-
-            controls: 0,
-
-            rel: 0,
-
-            modestbranding: 1,
-
-            playsinline: 1,
-          },
-
-          events: {
-            onReady: function () {
-              youtubeReady = true;
-
-              loadPlaylist();
-            },
-
-            onStateChange: function (event) {
-              handleYoutubeState(event);
-            },
-
-            onError: function (event) {
-              console.warn("YouTube 오류:", event.data);
-
-              setMusicTitle("음악을 재생할 수 없습니다");
-            },
-          },
-        });
-      }
-
-      window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-
-      /* =========================================================
-   LOAD PLAYLIST
-========================================================= */
-
-      function loadPlaylist() {
-        if (!youtubeReady || !ytPlayer) {
-          return;
-        }
-
-        try {
-          ytPlayer.cuePlaylist({
-            listType: "playlist",
-
-            list: PLAYLIST_ID,
-
-            index: 0,
-
-            startSeconds: 0,
-          });
-
-          setMusicTitle("음악 준비 완료");
-        } catch (e) {
-          console.error("플레이리스트 로드 실패:", e);
-        }
-      }
-
-      /* =========================================================
-   YOUTUBE STATE
-========================================================= */
-
-      function handleYoutubeState(event) {
-        if (!window.YT || !YT.PlayerState) {
-          return;
-        }
-
-        if (event.data === YT.PlayerState.PLAYING) {
-          updateCurrentVideoTitle();
-
-          setTimeout(updateCurrentVideoTitle, 300);
-
-          setTimeout(updateCurrentVideoTitle, 1000);
-        }
-
-        if (event.data === YT.PlayerState.ENDED) {
-          setTimeout(updateCurrentVideoTitle, 500);
-        }
-      }
-
-      /* =========================================================
-   CURRENT SONG TITLE
-========================================================= */
-
-      function updateCurrentVideoTitle() {
-        if (!ytPlayer || !youtubeReady) {
-          return;
-        }
-
-        try {
-          const data = ytPlayer.getVideoData();
-
-          if (data && data.title) {
-            setMusicTitle(data.title);
-          }
-        } catch (e) {
-          console.warn("노래 제목을 가져올 수 없습니다:", e);
-        }
-      }
-
-      /* =========================================================
-   PLAY MUSIC
-========================================================= */
-
-      function playMusic() {
-        if (!youtubeReady || !ytPlayer) {
-          setMusicTitle("음악 준비 중...");
-
-          return;
-        }
-
-        try {
-          ytPlayer.playVideo();
-
-          setTimeout(updateCurrentVideoTitle, 300);
-
-          setTimeout(updateCurrentVideoTitle, 1000);
-        } catch (e) {
-          console.warn("YouTube 재생 실패:", e);
-        }
-      }
-
-      /* =========================================================
-   PAUSE MUSIC
-========================================================= */
-
-      function pauseMusic() {
-        if (!youtubeReady || !ytPlayer) {
-          return;
-        }
-
-        try {
-          ytPlayer.pauseVideo();
-        } catch (e) {
-          console.warn("YouTube 일시정지 실패:", e);
-        }
-      }
-
-      /* =========================================================
-   RESET MUSIC
-========================================================= */
-
-      function resetMusic() {
-        if (!youtubeReady || !ytPlayer) {
-          return;
-        }
-
-        try {
-          ytPlayer.stopVideo();
-
-          ytPlayer.cuePlaylist({
-            listType: "playlist",
-
-            list: PLAYLIST_ID,
-
-            index: 0,
-
-            startSeconds: 0,
-          });
-
-          setMusicTitle("음악 대기 중");
-        } catch (e) {
-          console.warn("YouTube 초기화 실패:", e);
-        }
-      }
 
       /* =========================================================
    BACKGROUND PICKER
@@ -1150,20 +619,16 @@
       pickBackground();
 
       /* =========================================================
-   FORMAT TIME
+   TIME FORMAT
 ========================================================= */
 
       function format(sec) {
         sec = Math.max(0, Math.ceil(sec));
 
-        const minutes = Math.floor(sec / 60);
-
-        const seconds = sec % 60;
-
         return (
-          String(minutes).padStart(2, "0") +
+          String(Math.floor(sec / 60)).padStart(2, "0") +
           ":" +
-          String(seconds).padStart(2, "0")
+          String(sec % 60).padStart(2, "0")
         );
       }
 
@@ -1177,6 +642,14 @@
         modeEl.textContent = phase === "focus" ? "집중" : "휴식";
 
         sessionEl.textContent = `ROUND ${round}`;
+
+        /*
+    진행률
+
+    0%
+    ↓
+    100%
+  */
 
         const ratio = Math.max(
           0,
@@ -1231,7 +704,7 @@
       });
 
       /* =========================================================
-   SOUND
+   PLAY SOUND
 ========================================================= */
 
       function beep(kind) {
@@ -1240,10 +713,10 @@
 
           audio.currentTime = 0;
 
-          const promise = audio.play();
+          const p = audio.play();
 
-          if (promise) {
-            promise.catch((e) => {
+          if (p) {
+            p.catch((e) => {
               console.warn("알림음 재생 실패:", e);
             });
           }
@@ -1273,23 +746,21 @@
 
         running = true;
 
+        // 남은 시간을 실제 종료 시각으로 변환합니다.
+        endTime = Date.now() + remaining * 1000;
+
         lastTick = performance.now();
 
         beep(phase === "focus" ? "focusStart" : "breakStart");
 
-        if (phase === "focus") {
-          playMusic();
-
-          showToast("집중 시작 🍅 🎵");
-        } else {
-          pauseMusic();
-
-          setMusicTitle("휴식 중 ☕");
-
-          showToast("휴식 시작 ☕");
-        }
+        showToast(phase === "focus" ? "집중 시작 🍅" : "휴식 시작 ☕");
 
         timerId = requestAnimationFrame(tick);
+
+        // 백그라운드 탭에서 requestAnimationFrame이 멈추더라도
+        // 주기적으로 실제 종료 시각을 확인합니다.
+        clearInterval(backgroundTimerId);
+        backgroundTimerId = setInterval(checkTimer, 250);
       }
 
       /* =========================================================
@@ -1301,25 +772,38 @@
           return;
         }
 
-        const delta = (now - lastTick) / 1000;
+        checkTimer();
 
-        lastTick = now;
-
-        remaining -= delta;
-
-        if (remaining <= 0) {
-          remaining = 0;
-
-          render();
-
-          transition();
-
+        if (!running) {
           return;
         }
+
+        // 화면 갱신은 requestAnimationFrame에 맡기되,
+        // 실제 시간은 endTime을 기준으로 계산합니다.
+        remaining = Math.max(0, (endTime - Date.now()) / 1000);
 
         render();
 
         timerId = requestAnimationFrame(tick);
+      }
+
+      /*
+       * 실제 타이머 종료 여부를 wall-clock 기준으로 확인합니다.
+       * 백그라운드 탭에서는 requestAnimationFrame이 호출되지 않을 수 있으므로
+       * 별도의 interval에서도 이 함수를 호출합니다.
+       */
+      function checkTimer() {
+        if (!running || endTime === null) {
+          return;
+        }
+
+        remaining = Math.max(0, (endTime - Date.now()) / 1000);
+
+        if (remaining <= 0) {
+          remaining = 0;
+          render();
+          transition();
+        }
       }
 
       /* =========================================================
@@ -1331,30 +815,41 @@
           return;
         }
 
+        // 일시정지 순간의 실제 남은 시간을 보존합니다.
+        remaining = Math.max(0, (endTime - Date.now()) / 1000);
+
         running = false;
 
         cancelAnimationFrame(timerId);
-
-        pauseMusic();
+        clearInterval(backgroundTimerId);
+        backgroundTimerId = null;
+        endTime = null;
 
         beep("pause");
+
+        render();
 
         showToast("일시정지");
       }
 
       /* =========================================================
-   PHASE TRANSITION
+   TRANSITION
 ========================================================= */
 
       function transition() {
         running = false;
 
         cancelAnimationFrame(timerId);
+        clearInterval(backgroundTimerId);
+        backgroundTimerId = null;
+        endTime = null;
 
         if (phase === "focus") {
-          beep("focusEnd");
+          /*
+      집중 종료
+    */
 
-          pauseMusic();
+          beep("focusEnd");
 
           phase = "break";
 
@@ -1362,10 +857,12 @@
 
           remaining = duration;
 
-          setMusicTitle("휴식 중 ☕");
-
           showToast("집중 끝! 5분 휴식 🌿");
         } else {
+          /*
+      휴식 종료
+    */
+
           beep("breakEnd");
 
           phase = "focus";
@@ -1378,15 +875,10 @@
 
           pickBackground();
 
-          showToast("휴식 끝! 다시 집중 🍅 🎵");
+          showToast("휴식 끝! 다시 집중 🍅");
         }
 
         render();
-
-        /*
-    다음 단계는 자동으로 시작
-  */
-
         start();
       }
 
@@ -1406,6 +898,9 @@
         running = false;
 
         cancelAnimationFrame(timerId);
+        clearInterval(backgroundTimerId);
+        backgroundTimerId = null;
+        endTime = null;
 
         phase = "focus";
 
@@ -1415,10 +910,6 @@
 
         round = 1;
 
-        pauseMusic();
-
-        resetMusic();
-
         pickBackground();
 
         render();
@@ -1427,66 +918,38 @@
       }
 
       /* =========================================================
-   FULLSCREEN
+   VISIBILITY / BACKGROUND RECOVERY
 ========================================================= */
 
-      const fullscreenBtn = document.getElementById("fullscreenBtn");
+      // 다른 탭을 사용하다 돌아왔을 때 즉시 실제 경과 시간을 반영합니다.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && running) {
+          checkTimer();
 
-      function updateFullscreenButton() {
-        if (document.fullscreenElement) {
-          fullscreenBtn.textContent = "⛶";
-
-          fullscreenBtn.title = "전체 화면 종료";
-
-          fullscreenBtn.setAttribute("aria-label", "전체 화면 종료");
-        } else {
-          fullscreenBtn.textContent = "⛶";
-
-          fullscreenBtn.title = "전체 화면";
-
-          fullscreenBtn.setAttribute("aria-label", "전체 화면");
-        }
-      }
-
-      async function toggleFullscreen() {
-        try {
-          if (!document.fullscreenElement) {
-            await document.documentElement.requestFullscreen();
-          } else {
-            await document.exitFullscreen();
+          if (running) {
+            remaining = Math.max(0, (endTime - Date.now()) / 1000);
+            render();
           }
-        } catch (error) {
-          console.warn("전체 화면 전환 실패:", error);
-
-          showToast("이 브라우저에서는 전체 화면을 사용할 수 없습니다.");
         }
-      }
-
-      fullscreenBtn.addEventListener("click", toggleFullscreen);
-
-      document.addEventListener("fullscreenchange", updateFullscreenButton);
+      });
 
       /* =========================================================
    BUTTON EVENTS
 ========================================================= */
 
-      document.getElementById("start").addEventListener("click", start);
+      document.getElementById("start").onclick = start;
 
-      document.getElementById("pause").addEventListener("click", pause);
+      document.getElementById("pause").onclick = pause;
 
-      document.getElementById("skip").addEventListener("click", skip);
+      document.getElementById("skip").onclick = skip;
 
-      document.getElementById("reset").addEventListener("click", reset);
+      document.getElementById("reset").onclick = reset;
 
       /* =========================================================
-   INITIAL
+   INITIAL RENDER
 ========================================================= */
 
       render();
-
-      setMusicTitle("음악 준비 중...");
-
-      updateFullscreenButton();
     </script>
   </body>
 </html>
